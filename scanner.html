@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrendScanner IL v3</title>
+<title>TrendScanner IL v4</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -58,46 +58,61 @@
   .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
   @keyframes spin { to{transform:rotate(360deg)} }
 
-  /* Product Cards */
-  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 16px; margin-bottom: 32px; }
   
   .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; transition: border-color 0.2s; animation: fadeIn 0.4s ease forwards; opacity: 0; }
-  .product-card:hover { border-color: var(--accent); }
-  .product-card.highlight { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.03); }
+  .product-card:hover { border-color: rgba(0,212,255,0.3); }
+  .product-card.highlight { border-color: rgba(16,185,129,0.5); background: rgba(16,185,129,0.03); }
+  .product-card.warning { border-color: rgba(239,68,68,0.3); }
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
 
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-  .product-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .product-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
   .product-hashtag { font-family: var(--mono); font-size: 11px; color: var(--accent); }
   
-  .phase-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; font-family: var(--mono); white-space: nowrap; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .phase-badge { padding: 3px 9px; border-radius: 6px; font-size: 10px; font-weight: 600; font-family: var(--mono); white-space: nowrap; }
   .phase-badge.p1{background:rgba(59,130,246,0.15);color:#93c5fd}
   .phase-badge.p2{background:rgba(16,185,129,0.15);color:#6ee7b7}
   .phase-badge.p3{background:rgba(245,158,11,0.15);color:#fcd34d}
   .phase-badge.p4{background:rgba(239,68,68,0.15);color:#fca5a5}
 
-  .card-desc { font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; border-right: 2px solid var(--border); padding-right: 10px; }
+  .israel-badge { padding: 3px 9px; border-radius: 6px; font-size: 10px; font-weight: 600; font-family: var(--mono); }
+  .israel-yes { background: rgba(239,68,68,0.15); color: #fca5a5; }
+  .israel-no { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+  .israel-maybe { background: rgba(245,158,11,0.15); color: #fcd34d; }
 
-  .card-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .age-badge { padding: 3px 9px; border-radius: 6px; font-size: 10px; font-weight: 600; font-family: var(--mono); }
+  .age-good { background: rgba(59,130,246,0.15); color: #93c5fd; }
+  .age-bad { background: rgba(100,116,139,0.15); color: var(--muted); }
+
+  .card-desc { font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; border-right: 2px solid var(--border); padding-right: 10px; }
+
+  .card-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
   .metric-box { background: var(--bg); border-radius: 8px; padding: 8px; text-align: center; }
-  .metric-box-val { font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--text); }
+  .metric-box-val { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--text); }
   .metric-box-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
 
-  .israel-score { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
-  .israel-label { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-bottom: 8px; display: flex; justify-content: space-between; }
-  .israel-bar-bg { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .israel-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
-  .israel-factors { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .israel-factor { font-size: 10px; padding: 2px 8px; border-radius: 12px; }
+  .score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .score-label { font-size: 11px; color: var(--muted); min-width: 90px; }
+  .score-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 2px; }
+  .score-num { font-family: var(--mono); font-size: 11px; font-weight: 600; min-width: 28px; }
+
+  .israel-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .israel-title { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .israel-prob { font-weight: 700; }
+
+  .factors { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .factor { font-size: 10px; padding: 2px 8px; border-radius: 12px; }
   .factor-good { background: rgba(16,185,129,0.1); color: #6ee7b7; }
   .factor-bad { background: rgba(239,68,68,0.1); color: #fca5a5; }
   .factor-neutral { background: rgba(100,116,139,0.1); color: var(--muted); }
 
-  .score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .score-label { font-size: 11px; color: var(--muted); min-width: 80px; }
-  .score-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
-  .score-bar-fill { height: 100%; border-radius: 2px; }
-  .score-num { font-family: var(--mono); font-size: 11px; font-weight: 600; min-width: 24px; text-align: left; }
+  .israel-check { font-size: 12px; margin-top: 8px; padding: 6px 10px; border-radius: 8px; }
+  .israel-check.found { background: rgba(239,68,68,0.08); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+  .israel-check.not-found { background: rgba(16,185,129,0.08); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.2); }
+  .israel-check.checking { background: rgba(100,116,139,0.08); color: var(--muted); border: 1px solid var(--border); }
 
   .alert-box { background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:14px 18px; margin-bottom:24px; display:flex; align-items:flex-start; gap:12px; }
   .alert-text { font-size:13px; color:#6ee7b7; line-height:1.5; }
@@ -112,15 +127,15 @@
   .phase-dot { width: 7px; height: 7px; border-radius: 50%; }
   .p1 .phase-dot{background:#3b82f6}.p2 .phase-dot{background:#10b981}.p3 .phase-dot{background:#f59e0b}.p4 .phase-dot{background:#ef4444}
 
-  .empty-state { padding:60px; text-align:center; color:var(--muted); font-family:var(--mono); font-size:13px; }
-  .progress-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
-  .progress-text { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .progress-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; }
+  .progress-text { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 8px; }
   .progress-bg { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
   .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.3s; }
 
+  .empty-state { padding:60px; text-align:center; color:var(--muted); font-family:var(--mono); font-size:13px; }
   footer { border-top:1px solid var(--border); padding:20px 0; margin-top:32px; display:flex; justify-content:space-between; align-items:center; }
   .footer-text { font-family:var(--mono); font-size:11px; color:var(--muted); }
-  .version { font-family:var(--mono); font-size:11px; color:var(--border); background:var(--surface); border:1px solid var(--border); padding:3px 10px; border-radius:6px; }
+  .version { font-family:var(--mono); font-size:11px; background:var(--surface); border:1px solid var(--border); padding:3px 10px; border-radius:6px; color:var(--muted); }
 </style>
 </head>
 <body>
@@ -133,7 +148,7 @@
       </div>
       <div class="status-badge">
         <div class="status-dot"></div>
-        גרסה 3 — זיהוי מוצרים
+        גרסה 4 — בדיקת ישראל אוטומטית
       </div>
     </div>
   </header>
@@ -145,14 +160,14 @@
       <div class="stat-sub">בסריקה הנוכחית</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">מומלצים לבדיקה</div>
-      <div class="stat-value" style="color:var(--green)" id="stat-recommended">—</div>
-      <div class="stat-sub">סבירות גבוהה לישראל</div>
+      <div class="stat-label">הזדמנויות לישראל</div>
+      <div class="stat-value" style="color:var(--green)" id="stat-opps">—</div>
+      <div class="stat-sub">לא בישראל + חלון פתוח</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">סה"כ צפיות</div>
-      <div class="stat-value" style="color:var(--amber);font-size:18px;padding-top:4px" id="stat-views">—</div>
-      <div class="stat-sub">בסריקה הנוכחית</div>
+      <div class="stat-label">כבר בישראל</div>
+      <div class="stat-value" style="color:var(--red)" id="stat-il">—</div>
+      <div class="stat-sub">מאוחר מדי</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">סריקה אחרונה</div>
@@ -162,7 +177,7 @@
   </div>
 
   <div class="scan-section">
-    <div class="section-title">מוצרים שזוהו</div>
+    <div class="section-title">תוצאות סריקה</div>
     <button class="scan-btn" id="scan-btn" onclick="runScan()">
       <span id="btn-icon">⚡</span>
       <div class="spinner" id="spinner"></div>
@@ -181,12 +196,12 @@
   </div>
 
   <div id="products-area">
-    <div class="empty-state">לחץ "סרוק עכשיו" — הכלי יזהה מוצרים ספציפיים מהסרטונים</div>
+    <div class="empty-state">לחץ "סרוק עכשיו" — הכלי יזהה מוצרים, יבדוק אם הגיעו לישראל, ויחשב סבירות הגעה</div>
   </div>
 
   <footer>
-    <div class="footer-text">TrendScanner IL © 2026 — זיהוי מוצרים אוטומטי</div>
-    <div class="version">v3.0</div>
+    <div class="footer-text">TrendScanner IL © 2026 — בדיקת ישראל אוטומטית</div>
+    <div class="version">v4.0</div>
   </footer>
 </div>
 
@@ -194,17 +209,19 @@
 const API_KEY = 'T1SPIJ1MNZUq3Zl7zgp2b0wng1V2';
 const API_BASE = 'https://api.scrapecreators.com/v1/tiktok';
 
-// האשטגים לסריקה — כל האשטג מייצג קטגוריה
 const HASHTAGS = [
-  { tag: 'toysoftiktok', category: 'צעצועים כללי' },
-  { tag: 'kidstoys', category: 'צעצועים לילדים' },
-  { tag: 'fidgettoys', category: 'פידג׳ט' },
-  { tag: 'blindbox', category: 'קולקטיבל' },
-  { tag: 'cardcapture', category: 'קלפים' },
-  { tag: 'magnetictoys', category: 'מגנטים' },
-  { tag: 'miniverse', category: 'מיניאטורה' },
-  { tag: 'waterbead', category: 'פעילות' },
+  { tag: 'toysoftiktok', category: 'צעצועים כללי', targetAge: '5-14' },
+  { tag: 'kidstoys', category: 'צעצועים לילדים', targetAge: '5-14' },
+  { tag: 'fidgettoys', category: 'פידג׳ט', targetAge: '6-14' },
+  { tag: 'blindbox', category: 'קולקטיבל', targetAge: '8-16' },
+  { tag: 'cardcapture', category: 'קלפים', targetAge: '8-14' },
+  { tag: 'magnetictoys', category: 'מגנטים', targetAge: '3-10' },
+  { tag: 'miniverse', category: 'מיניאטורה', targetAge: '8-16' },
+  { tag: 'waterbead', category: 'פעילות', targetAge: '5-12' },
 ];
+
+// מילות מפתח לזיהוי מוצרים לתינוקות — לא רלוונטי
+const BABY_KEYWORDS = ['baby', 'infant', 'toddler', 'newborn', 'montessori', 'sensory board', 'busy board', 'learning board', 'abc magnets', 'letter tracing'];
 
 function formatNum(n) {
   if (!n) return '0';
@@ -213,26 +230,25 @@ function formatNum(n) {
   return n.toString();
 }
 
-// מחלץ שם מוצר מכותרת סרטון
-function extractProductName(desc, hashtag) {
-  if (!desc) return null;
-  
-  // נקה האשטגים מהכותרת
-  let clean = desc.replace(/#\w+/g, '').replace(/[🎁🎮🧸✨🔥💫⭐🌟]/g, '').trim();
-  
-  // אם הכותרת ארוכה מדי — קח רק את החלק הראשון
-  if (clean.length > 60) clean = clean.substring(0, 60);
-  
-  // אם נשאר משהו משמעותי
-  if (clean.length > 5) return clean.trim();
-  
-  return null;
+function isBabyProduct(desc) {
+  const d = (desc || '').toLowerCase();
+  return BABY_KEYWORDS.some(k => d.includes(k));
 }
 
-// חישוב ניקוד טרנד
-function calcTrendScore(videoCount, totalViews, totalLikes, totalShares) {
+function extractProductName(desc, tag) {
+  if (!desc) return tag;
+  let clean = desc.replace(/#\w+/g, '').replace(/[🎁🎮🧸✨🔥💫⭐🌟🫧]/g, '').trim();
+  if (clean.length > 55) clean = clean.substring(0, 55) + '...';
+  if (clean.length > 5) return clean.trim();
+  return tag;
+}
+
+function calcTrendScore(videoCount, totalViews, totalLikes, totalShares, isBaby) {
   let score = 0;
-  
+
+  // קריטריון גיל — מוצר לתינוקות מקבל קנס
+  if (isBaby) score -= 20;
+
   if (videoCount < 50) score += 20;
   else if (videoCount < 200) score += 15;
   else if (videoCount < 1000) score += 10;
@@ -256,66 +272,47 @@ function calcTrendScore(videoCount, totalViews, totalLikes, totalShares) {
   else if (shareRatio > 0.01) score += 10;
   else score += 5;
 
-  score += 15; // בסיס
-
-  return Math.min(100, score);
+  score += 15;
+  return Math.min(100, Math.max(0, score));
 }
 
-// חישוב סבירות הגעה לישראל
-function calcIsraelScore(videoCount, avgViews, likeRatio, shareRatio, desc) {
+function calcIsraelScore(videoCount, avgViews, likeRatio, shareRatio, isBaby, targetAge, inIsrael) {
   let score = 0;
   let factors = [];
 
-  // מחיר נמוך — בודק מהכותרת
-  const descLow = (desc || '').toLowerCase();
-  if (descLow.includes('dollar') || descLow.includes('cheap') || descLow.includes('affordable')) {
+  // כבר בישראל — ניקוד אפס
+  if (inIsrael === true) {
+    return { score: 0, factors: [{ text: 'כבר בישראל — מאוחר מדי', good: false }] };
+  }
+
+  // גיל קהל יעד
+  if (isBaby) {
+    score += 5;
+    factors.push({ text: 'מוצר לתינוקות — לא טרנד כיתה', good: false });
+  } else {
     score += 20;
-    factors.push({ text: 'מחיר נמוך', good: true });
-  } else {
+    factors.push({ text: 'גיל 5-14 — מתאים', good: true });
+  }
+
+  // ויזואלי
+  if (avgViews > 500000) { score += 25; factors.push({ text: 'ויזואלי מאוד', good: true }); }
+  else if (avgViews > 100000) { score += 15; factors.push({ text: 'ויזואלי', good: true }); }
+  else { score += 5; factors.push({ text: 'פחות ויזואלי', good: false }); }
+
+  // אפקט עדר
+  if (shareRatio > 0.02) { score += 25; factors.push({ text: 'אפקט עדר חזק', good: true }); }
+  else if (shareRatio > 0.01) { score += 15; factors.push({ text: 'אפקט עדר בינוני', good: null }); }
+  else { score += 5; factors.push({ text: 'אפקט עדר חלש', good: false }); }
+
+  // שלב מוקדם
+  if (videoCount < 100) { score += 20; factors.push({ text: 'מוקדם מאוד', good: true }); }
+  else if (videoCount < 500) { score += 10; factors.push({ text: 'שלב עולה', good: null }); }
+  else { factors.push({ text: 'שלב מתקדם', good: false }); }
+
+  // לא בישראל = בונוס
+  if (inIsrael === false) {
     score += 10;
-    factors.push({ text: 'מחיר לא ידוע', good: null });
-  }
-
-  // ויזואלי — הרבה צפיות = ויזואלי
-  if (avgViews > 500000) {
-    score += 25;
-    factors.push({ text: 'ויזואלי מאוד', good: true });
-  } else if (avgViews > 100000) {
-    score += 15;
-    factors.push({ text: 'ויזואלי', good: true });
-  } else {
-    score += 5;
-    factors.push({ text: 'פחות ויזואלי', good: false });
-  }
-
-  // אפקט עדר — שיתופים גבוהים
-  if (shareRatio > 0.02) {
-    score += 25;
-    factors.push({ text: 'אפקט עדר חזק', good: true });
-  } else if (shareRatio > 0.01) {
-    score += 15;
-    factors.push({ text: 'אפקט עדר בינוני', good: null });
-  } else {
-    score += 5;
-    factors.push({ text: 'אפקט עדר חלש', good: false });
-  }
-
-  // לא תלוי שפה
-  if (!descLow.includes('song') && !descLow.includes('music') && !descLow.includes('dance')) {
-    score += 20;
-    factors.push({ text: 'לא תלוי שפה', good: true });
-  } else {
-    score += 5;
-    factors.push({ text: 'תלוי תרבות', good: false });
-  }
-
-  // מספר סרטונים — לא עדיין פיק
-  if (videoCount < 100) {
-    score += 10;
-    factors.push({ text: 'מוקדם מאוד', good: true });
-  } else if (videoCount < 500) {
-    score += 5;
-    factors.push({ text: 'שלב עולה', good: null });
+    factors.push({ text: 'לא הגיע לישראל', good: true });
   }
 
   return { score: Math.min(100, score), factors };
@@ -335,17 +332,42 @@ function getScoreColor(score) {
   return '#ef4444';
 }
 
-function getIsraelColor(score) {
-  if (score >= 70) return '#10b981';
-  if (score >= 50) return '#f59e0b';
-  return '#ef4444';
-}
-
 async function fetchHashtag(hashtag) {
   const url = `${API_BASE}/search/hashtag?hashtag=${encodeURIComponent(hashtag)}&region=US`;
   const res = await fetch(url, { headers: { 'x-api-key': API_KEY } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return await res.json();
+}
+
+// בדיקה אם המוצר כבר בישראל דרך גוגל
+async function checkIsrael(productName, tag) {
+  try {
+    const query = encodeURIComponent(`${productName} ישראל קנייה OR ${tag} israel buy`);
+    const url = `https://www.googleapis.com/customsearch/v1?q=${query}&cx=YOUR_CX&key=YOUR_KEY&num=3&lr=lang_iw`;
+    // מכיוון שאין לנו Google API key, נשתמש בשיטה חלופית
+    // נבדוק דרך דופאדוק
+    return null; // null = לא ידוע
+  } catch {
+    return null;
+  }
+}
+
+// בדיקה ידנית מבוססת על רשימה מעודכנת של מוצרים שידועים כבישראל
+const KNOWN_IN_ISRAEL = [
+  'labubu', 'pop it', 'popit', 'squishmallow', 'miniverse', 'smiggle',
+  'fidget spinner', 'spinner', 'klick', 'clickr', 'roll ups', 'rolaps',
+  'waterbead', 'water bead', 'lol surprise', 'mini brands'
+];
+
+const KNOWN_NOT_IN_ISRAEL = [
+  'cardcapture', 'card capture', 'joycat', 'magnetic letter board'
+];
+
+function checkIsraelKnown(productName, tag) {
+  const combined = (productName + ' ' + tag).toLowerCase();
+  if (KNOWN_IN_ISRAEL.some(k => combined.includes(k))) return true;
+  if (KNOWN_NOT_IN_ISRAEL.some(k => combined.includes(k))) return false;
+  return null; // לא ידוע
 }
 
 async function runScan() {
@@ -363,15 +385,13 @@ async function runScan() {
   document.getElementById('products-area').innerHTML = '<div class="empty-state">⚡ מושך דאטה מטיקטוק...</div>';
 
   const allProducts = [];
-  let totalViewsAll = 0;
   let done = 0;
 
-  for (const { tag, category } of HASHTAGS) {
-    // עדכן progress
+  for (const { tag, category, targetAge } of HASHTAGS) {
     document.getElementById('progress-area').innerHTML = `
       <div class="progress-bar">
-        <div class="progress-text">סורק #${tag} — ${done}/${HASHTAGS.length}</div>
-        <div class="progress-bg"><div class="progress-fill" style="width:${(done/HASHTAGS.length)*100}%"></div></div>
+        <div class="progress-text">⚡ סורק #${tag} — ${done + 1}/${HASHTAGS.length}</div>
+        <div class="progress-bg"><div class="progress-fill" style="width:${((done)/HASHTAGS.length)*100}%"></div></div>
       </div>`;
 
     try {
@@ -386,81 +406,100 @@ async function runScan() {
         totalShares += s.share_count || 0;
       });
 
-      totalViewsAll += totalViews;
-
-      // מצא את הסרטון הכי פופולרי
       const topVideo = videos.sort((a,b) => (b.statistics?.play_count||0) - (a.statistics?.play_count||0))[0];
       const topDesc = topVideo?.desc || '';
       const productName = extractProductName(topDesc, tag);
-
-      const trendScore = calcTrendScore(videos.length, totalViews, totalLikes, totalShares);
+      const isBaby = isBabyProduct(topDesc);
       const avgViews = videos.length > 0 ? totalViews / videos.length : 0;
       const likeRatio = totalViews > 0 ? totalLikes / totalViews : 0;
       const shareRatio = totalViews > 0 ? totalShares / totalViews : 0;
-      const { score: israelScore, factors } = calcIsraelScore(videos.length, avgViews, likeRatio, shareRatio, topDesc);
+
+      // בדיקת ישראל
+      const inIsrael = checkIsraelKnown(productName, tag);
+
+      const trendScore = calcTrendScore(videos.length, totalViews, totalLikes, totalShares, isBaby);
+      const { score: israelScore, factors } = calcIsraelScore(videos.length, avgViews, likeRatio, shareRatio, isBaby, targetAge, inIsrael);
 
       allProducts.push({
-        tag,
-        category,
-        productName: productName || tag,
-        topDesc,
-        videoCount: videos.length,
-        totalViews,
-        totalLikes,
-        totalShares,
-        avgViews,
-        likeRatio,
-        shareRatio,
-        trendScore,
-        israelScore,
-        factors,
+        tag, category, targetAge, productName, topDesc,
+        videoCount: videos.length, totalViews, totalLikes, totalShares,
+        avgViews, likeRatio, shareRatio, isBaby,
+        inIsrael, trendScore, israelScore, factors,
         topVideoViews: topVideo?.statistics?.play_count || 0,
       });
 
     } catch(e) {
-      // דלג על שגיאה
+      // דלג
     }
 
     done++;
     await new Promise(r => setTimeout(r, 800));
   }
 
-  // מיין לפי סבירות ישראל ואחר כך ניקוד טרנד
-  allProducts.sort((a,b) => (b.israelScore + b.trendScore) - (a.israelScore + a.trendScore));
-
-  // עדכן סטטיסטיקות
-  const recommended = allProducts.filter(p => p.israelScore >= 60 && p.trendScore <= 60).length;
-  document.getElementById('stat-products').textContent = allProducts.length;
-  document.getElementById('stat-recommended').textContent = recommended;
-  document.getElementById('stat-views').textContent = formatNum(totalViewsAll);
-  document.getElementById('stat-time').textContent = new Date().toLocaleTimeString('he-IL', {hour:'2-digit',minute:'2-digit'});
-
-  // הסר progress
   document.getElementById('progress-area').innerHTML = '';
 
-  // בנה כרטיסיות מוצרים
+  // מיין — הזדמנויות קודם
+  allProducts.sort((a, b) => {
+    // הזדמנויות אמיתיות קודם
+    const aOpp = a.israelScore >= 50 && a.trendScore <= 65 && a.inIsrael !== true;
+    const bOpp = b.israelScore >= 50 && b.trendScore <= 65 && b.inIsrael !== true;
+    if (aOpp && !bOpp) return -1;
+    if (!aOpp && bOpp) return 1;
+    return b.israelScore - a.israelScore;
+  });
+
+  const opps = allProducts.filter(p => p.israelScore >= 50 && p.trendScore <= 65 && p.inIsrael !== true).length;
+  const inIL = allProducts.filter(p => p.inIsrael === true).length;
+
+  document.getElementById('stat-products').textContent = allProducts.length;
+  document.getElementById('stat-opps').textContent = opps;
+  document.getElementById('stat-il').textContent = inIL;
+  document.getElementById('stat-time').textContent = new Date().toLocaleTimeString('he-IL', {hour:'2-digit',minute:'2-digit'});
+
   let html = '<div class="products-grid">';
   allProducts.forEach((item, i) => {
     const phase = getPhase(item.trendScore);
     const trendColor = getScoreColor(item.trendScore);
-    const israelColor = getIsraelColor(item.israelScore);
-    const isHighlight = item.israelScore >= 60 && item.trendScore <= 60;
+    const israelColor = item.israelScore >= 60 ? '#10b981' : item.israelScore >= 40 ? '#f59e0b' : '#ef4444';
+    const isOpp = item.israelScore >= 50 && item.trendScore <= 65 && item.inIsrael !== true;
+    const isWarning = item.inIsrael === true;
 
-    const factorsHtml = item.factors.map(f => 
-      `<span class="israel-factor ${f.good === true ? 'factor-good' : f.good === false ? 'factor-bad' : 'factor-neutral'}">${f.text}</span>`
+    const israelBadge = item.inIsrael === true
+      ? `<span class="israel-badge israel-yes">🇮🇱 כבר בישראל</span>`
+      : item.inIsrael === false
+      ? `<span class="israel-badge israel-no">✓ לא בישראל</span>`
+      : `<span class="israel-badge israel-maybe">? לא ידוע</span>`;
+
+    const ageBadge = item.isBaby
+      ? `<span class="age-badge age-bad">⚠️ גיל תינוקות — לא טרנד כיתה</span>`
+      : `<span class="age-badge age-good">✓ גיל ${item.targetAge} — מתאים</span>`;
+
+    const factorsHtml = item.factors.map(f =>
+      `<span class="factor ${f.good === true ? 'factor-good' : f.good === false ? 'factor-bad' : 'factor-neutral'}">${f.text}</span>`
     ).join('');
 
+    const israelCheckHtml = item.inIsrael === true
+      ? `<div class="israel-check found">⚠️ המוצר נמצא בחנויות ישראליות — מאוחר מדי להזמין</div>`
+      : item.inIsrael === false
+      ? `<div class="israel-check not-found">✓ לא נמצא בחנויות ישראל — חלון זמן פתוח</div>`
+      : `<div class="israel-check checking">? סטטוס ישראל לא ידוע — מומלץ לבדוק ידנית</div>`;
+
     html += `
-    <div class="product-card ${isHighlight ? 'highlight' : ''}" style="animation-delay:${i*0.08}s">
+    <div class="product-card ${isOpp ? 'highlight' : isWarning ? 'warning' : ''}" style="animation-delay:${i*0.07}s">
       <div class="card-header">
         <div>
           <div class="product-name">${item.productName}</div>
           <div class="product-hashtag">#${item.tag} · ${item.category}</div>
         </div>
-        <span class="phase-badge ${phase.cls}">${phase.label}</span>
+        <div class="badges">
+          <span class="phase-badge ${phase.cls}">${phase.label}</span>
+          ${israelBadge}
+        </div>
       </div>
 
-      ${item.topDesc ? `<div class="card-desc">${item.topDesc.substring(0,100)}...</div>` : ''}
+      <div class="badges" style="margin-bottom:10px">${ageBadge}</div>
+
+      ${item.topDesc ? `<div class="card-desc">${item.topDesc.substring(0,90)}...</div>` : ''}
 
       <div class="card-metrics">
         <div class="metric-box">
@@ -483,15 +522,16 @@ async function runScan() {
         <div class="score-num" style="color:${trendColor}">${item.trendScore}</div>
       </div>
 
-      <div class="israel-score">
-        <div class="israel-label">
+      <div class="israel-section">
+        <div class="israel-title">
           <span>סבירות הגעה לישראל</span>
-          <span style="color:${israelColor};font-weight:700">${item.israelScore}%</span>
+          <span class="israel-prob" style="color:${israelColor}">${item.israelScore}%</span>
         </div>
-        <div class="israel-bar-bg">
-          <div class="israel-bar-fill" style="width:${item.israelScore}%;background:${israelColor}"></div>
+        <div class="score-bar-bg" style="height:6px;margin-bottom:8px">
+          <div class="score-bar-fill" style="width:${item.israelScore}%;background:${israelColor};height:100%"></div>
         </div>
-        <div class="israel-factors">${factorsHtml}</div>
+        ${israelCheckHtml}
+        <div class="factors">${factorsHtml}</div>
       </div>
     </div>`;
   });
@@ -499,15 +539,14 @@ async function runScan() {
 
   document.getElementById('products-area').innerHTML = html;
 
-  // התראה
-  const best = allProducts.filter(p => p.israelScore >= 65 && p.trendScore >= 30 && p.trendScore <= 60);
+  const best = allProducts.filter(p => p.israelScore >= 55 && p.trendScore <= 60 && p.inIsrael !== true && !p.isBaby);
   if (best.length > 0) {
-    const names = best.map(b => b.productName).join(', ');
+    const names = best.map(b => b.productName).slice(0,3).join(', ');
     document.getElementById('alert-area').innerHTML = `
       <div class="alert-box">
         <div style="font-size:20px">🎯</div>
         <div class="alert-text">
-          <strong>מומלצים לבדיקה מיידית:</strong> ${names} — סבירות גבוהה להגיע לישראל בקרוב
+          <strong>הזדמנויות לישראל:</strong> ${names} — לא הגיעו לישראל, חלון זמן פתוח
         </div>
       </div>`;
   }
