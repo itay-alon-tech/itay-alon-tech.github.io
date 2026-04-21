@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrendScanner IL</title>
+<title>TrendScanner IL v3</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -32,7 +32,7 @@
     pointer-events: none;
     z-index: 0;
   }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+  .container { max-width: 1300px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
   header { padding: 28px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
   .header-inner { display: flex; align-items: center; justify-content: space-between; }
   .logo { display: flex; align-items: center; gap: 12px; }
@@ -49,15 +49,6 @@
   .stat-value { font-size: 26px; font-weight: 900; color: var(--accent); font-family: var(--mono); }
   .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
-  .phase-legend { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
-  .phase-pill { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; border: 1px solid; }
-  .phase-pill.p1 { background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#93c5fd }
-  .phase-pill.p2 { background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:#6ee7b7 }
-  .phase-pill.p3 { background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:#fcd34d }
-  .phase-pill.p4 { background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#fca5a5 }
-  .phase-dot { width: 7px; height: 7px; border-radius: 50%; }
-  .p1 .phase-dot{background:#3b82f6}.p2 .phase-dot{background:#10b981}.p3 .phase-dot{background:#f59e0b}.p4 .phase-dot{background:#ef4444}
-
   .scan-section { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
   .section-title { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 10px; flex: 1; }
   .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
@@ -67,52 +58,69 @@
   .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
   @keyframes spin { to{transform:rotate(360deg)} }
 
-  .trend-table { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
-  .table-header { display: grid; grid-template-columns: 200px 1fr 1fr 1fr 1fr 1fr 130px; gap: 0; padding: 12px 20px; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-  .trend-row { display: grid; grid-template-columns: 200px 1fr 1fr 1fr 1fr 1fr 130px; gap: 0; padding: 16px 20px; border-bottom: 1px solid var(--border); align-items: center; transition: background 0.15s; animation: fadeIn 0.3s ease forwards; opacity: 0; }
-  .trend-row:last-child { border-bottom: none; }
-  .trend-row:hover { background: rgba(255,255,255,0.02); }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)} }
+  /* Product Cards */
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  
+  .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; transition: border-color 0.2s; animation: fadeIn 0.4s ease forwards; opacity: 0; }
+  .product-card:hover { border-color: var(--accent); }
+  .product-card.highlight { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.03); }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
 
-  .hashtag { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--accent); }
-  .hashtag-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .metric { font-family: var(--mono); font-size: 12px; color: var(--text); }
-  .metric-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
-  .growth { font-family: var(--mono); font-size: 13px; font-weight: 600; }
-  .growth.up { color: var(--green); }
-  .growth.down { color: var(--red); }
-  .growth.neutral { color: var(--muted); }
-
-  .score-wrap { display: flex; align-items: center; gap: 8px; }
-  .score-bar-bg { flex:1; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
-  .score-bar-fill { height:100%; border-radius:2px; }
-  .score-num { font-family:var(--mono); font-size:12px; font-weight:600; min-width:22px; }
-
-  .phase-badge { padding: 3px 9px; border-radius: 6px; font-size: 10px; font-weight: 600; font-family: var(--mono); text-align: center; white-space: nowrap; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .product-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .product-hashtag { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+  
+  .phase-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; font-family: var(--mono); white-space: nowrap; }
   .phase-badge.p1{background:rgba(59,130,246,0.15);color:#93c5fd}
   .phase-badge.p2{background:rgba(16,185,129,0.15);color:#6ee7b7}
   .phase-badge.p3{background:rgba(245,158,11,0.15);color:#fcd34d}
   .phase-badge.p4{background:rgba(239,68,68,0.15);color:#fca5a5}
 
+  .card-desc { font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; border-right: 2px solid var(--border); padding-right: 10px; }
+
+  .card-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .metric-box { background: var(--bg); border-radius: 8px; padding: 8px; text-align: center; }
+  .metric-box-val { font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--text); }
+  .metric-box-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .israel-score { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .israel-label { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .israel-bar-bg { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .israel-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .israel-factors { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .israel-factor { font-size: 10px; padding: 2px 8px; border-radius: 12px; }
+  .factor-good { background: rgba(16,185,129,0.1); color: #6ee7b7; }
+  .factor-bad { background: rgba(239,68,68,0.1); color: #fca5a5; }
+  .factor-neutral { background: rgba(100,116,139,0.1); color: var(--muted); }
+
+  .score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .score-label { font-size: 11px; color: var(--muted); min-width: 80px; }
+  .score-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 2px; }
+  .score-num { font-family: var(--mono); font-size: 11px; font-weight: 600; min-width: 24px; text-align: left; }
+
   .alert-box { background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:14px 18px; margin-bottom:24px; display:flex; align-items:flex-start; gap:12px; }
   .alert-text { font-size:13px; color:#6ee7b7; line-height:1.5; }
   .alert-text strong { font-weight:700; }
 
-  .error-box { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:12px; padding:14px 18px; margin-bottom:24px; font-size:13px; color:#fca5a5; }
+  .phase-legend { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+  .phase-pill { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; border: 1px solid; }
+  .phase-pill.p1 { background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#93c5fd }
+  .phase-pill.p2 { background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:#6ee7b7 }
+  .phase-pill.p3 { background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:#fcd34d }
+  .phase-pill.p4 { background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#fca5a5 }
+  .phase-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .p1 .phase-dot{background:#3b82f6}.p2 .phase-dot{background:#10b981}.p3 .phase-dot{background:#f59e0b}.p4 .phase-dot{background:#ef4444}
 
-  .top-video { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 8px; }
-  .top-video-title { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .video-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
-  .video-item:last-child { border-bottom: none; }
-  .video-desc { color: var(--text); flex: 1; margin-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .video-stats { display: flex; gap: 16px; font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
-  .video-stat-good { color: var(--green); }
+  .empty-state { padding:60px; text-align:center; color:var(--muted); font-family:var(--mono); font-size:13px; }
+  .progress-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+  .progress-text { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .progress-bg { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.3s; }
 
   footer { border-top:1px solid var(--border); padding:20px 0; margin-top:32px; display:flex; justify-content:space-between; align-items:center; }
   .footer-text { font-family:var(--mono); font-size:11px; color:var(--muted); }
   .version { font-family:var(--mono); font-size:11px; color:var(--border); background:var(--surface); border:1px solid var(--border); padding:3px 10px; border-radius:6px; }
-
-  .empty-state { padding:40px; text-align:center; color:var(--muted); font-family:var(--mono); font-size:13px; }
 </style>
 </head>
 <body>
@@ -125,21 +133,21 @@
       </div>
       <div class="status-badge">
         <div class="status-dot"></div>
-        דאטה אמיתי מטיקטוק
+        גרסה 3 — זיהוי מוצרים
       </div>
     </div>
   </header>
 
   <div class="stats-bar">
     <div class="stat-card">
-      <div class="stat-label">האשטגים במעקב</div>
-      <div class="stat-value" id="stat-total">12</div>
-      <div class="stat-sub">סריקה שבועית</div>
+      <div class="stat-label">מוצרים שזוהו</div>
+      <div class="stat-value" id="stat-products">—</div>
+      <div class="stat-sub">בסריקה הנוכחית</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">חלון הזמנה</div>
-      <div class="stat-value" style="color:var(--green)" id="stat-buy">—</div>
-      <div class="stat-sub">ניקוד 36–60</div>
+      <div class="stat-label">מומלצים לבדיקה</div>
+      <div class="stat-value" style="color:var(--green)" id="stat-recommended">—</div>
+      <div class="stat-sub">סבירות גבוהה לישראל</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">סה"כ צפיות</div>
@@ -154,7 +162,7 @@
   </div>
 
   <div class="scan-section">
-    <div class="section-title">תוצאות סריקה</div>
+    <div class="section-title">מוצרים שזוהו</div>
     <button class="scan-btn" id="scan-btn" onclick="runScan()">
       <span id="btn-icon">⚡</span>
       <div class="spinner" id="spinner"></div>
@@ -163,7 +171,7 @@
   </div>
 
   <div id="alert-area"></div>
-  <div id="error-area"></div>
+  <div id="progress-area"></div>
 
   <div class="phase-legend">
     <div class="phase-pill p1"><div class="phase-dot"></div>גל ראשון (0–35)</div>
@@ -172,26 +180,13 @@
     <div class="phase-pill p4"><div class="phase-dot"></div>פיק / פספסת (81–100)</div>
   </div>
 
-  <div class="trend-table">
-    <div class="table-header">
-      <div>האשטג</div>
-      <div>סרטונים</div>
-      <div>צפיות סה"כ</div>
-      <div>לייקים</div>
-      <div>שיתופים</div>
-      <div>ניקוד</div>
-      <div>שלב</div>
-    </div>
-    <div id="table-body">
-      <div class="empty-state">לחץ "סרוק עכשיו" להתחיל — דאטה אמיתי מטיקטוק</div>
-    </div>
+  <div id="products-area">
+    <div class="empty-state">לחץ "סרוק עכשיו" — הכלי יזהה מוצרים ספציפיים מהסרטונים</div>
   </div>
 
-  <div id="videos-section"></div>
-
   <footer>
-    <div class="footer-text">TrendScanner IL © 2026 — מבוסס על דאטה אמיתי מטיקטוק</div>
-    <div class="version">v2.0 — Live Data</div>
+    <div class="footer-text">TrendScanner IL © 2026 — זיהוי מוצרים אוטומטי</div>
+    <div class="version">v3.0</div>
   </footer>
 </div>
 
@@ -199,20 +194,16 @@
 const API_KEY = 'T1SPIJ1MNZUq3Zl7zgp2b0wng1V2';
 const API_BASE = 'https://api.scrapecreators.com/v1/tiktok';
 
-// רשימת האשטגים לסריקה
+// האשטגים לסריקה — כל האשטג מייצג קטגוריה
 const HASHTAGS = [
-  'toysoftiktok',
-  'fidgettoys',
-  'blindbox',
-  'kidstoys',
-  'magnetictoys',
-  'squishmallow',
-  'popitchallenge',
-  'miniverse',
-  'smiggle',
-  'cardcapture',
-  'waterbead',
-  'labubu'
+  { tag: 'toysoftiktok', category: 'צעצועים כללי' },
+  { tag: 'kidstoys', category: 'צעצועים לילדים' },
+  { tag: 'fidgettoys', category: 'פידג׳ט' },
+  { tag: 'blindbox', category: 'קולקטיבל' },
+  { tag: 'cardcapture', category: 'קלפים' },
+  { tag: 'magnetictoys', category: 'מגנטים' },
+  { tag: 'miniverse', category: 'מיניאטורה' },
+  { tag: 'waterbead', category: 'פעילות' },
 ];
 
 function formatNum(n) {
@@ -222,41 +213,112 @@ function formatNum(n) {
   return n.toString();
 }
 
-function calcScore(videos, totalViews, totalLikes, totalShares) {
+// מחלץ שם מוצר מכותרת סרטון
+function extractProductName(desc, hashtag) {
+  if (!desc) return null;
+  
+  // נקה האשטגים מהכותרת
+  let clean = desc.replace(/#\w+/g, '').replace(/[🎁🎮🧸✨🔥💫⭐🌟]/g, '').trim();
+  
+  // אם הכותרת ארוכה מדי — קח רק את החלק הראשון
+  if (clean.length > 60) clean = clean.substring(0, 60);
+  
+  // אם נשאר משהו משמעותי
+  if (clean.length > 5) return clean.trim();
+  
+  return null;
+}
+
+// חישוב ניקוד טרנד
+function calcTrendScore(videoCount, totalViews, totalLikes, totalShares) {
   let score = 0;
   
-  // קריטריון 1: מספר סרטונים (20 נק')
-  if (videos < 100) score += 20;
-  else if (videos < 1000) score += 15;
-  else if (videos < 10000) score += 10;
-  else if (videos < 100000) score += 5;
-  else score += 2;
+  if (videoCount < 50) score += 20;
+  else if (videoCount < 200) score += 15;
+  else if (videoCount < 1000) score += 10;
+  else score += 3;
 
-  // קריטריון 2: ממוצע צפיות לסרטון (25 נק')
-  const avgViews = videos > 0 ? totalViews / videos : 0;
-  if (avgViews > 500000) score += 25;
-  else if (avgViews > 100000) score += 20;
-  else if (avgViews > 50000) score += 15;
-  else if (avgViews > 10000) score += 10;
+  const avgViews = videoCount > 0 ? totalViews / videoCount : 0;
+  if (avgViews > 1000000) score += 25;
+  else if (avgViews > 500000) score += 20;
+  else if (avgViews > 100000) score += 15;
+  else if (avgViews > 50000) score += 10;
   else score += 5;
 
-  // קריטריון 3: יחס לייקים לצפיות (20 נק')
   const likeRatio = totalViews > 0 ? totalLikes / totalViews : 0;
   if (likeRatio > 0.08) score += 20;
   else if (likeRatio > 0.05) score += 15;
   else if (likeRatio > 0.03) score += 10;
   else score += 5;
 
-  // קריטריון 4: שיתופים (15 נק')
   const shareRatio = totalViews > 0 ? totalShares / totalViews : 0;
   if (shareRatio > 0.02) score += 15;
   else if (shareRatio > 0.01) score += 10;
   else score += 5;
 
-  // קריטריון 5: לא בישראל עדיין (20 נק' — קבוע לעכשיו)
-  score += 15;
+  score += 15; // בסיס
 
   return Math.min(100, score);
+}
+
+// חישוב סבירות הגעה לישראל
+function calcIsraelScore(videoCount, avgViews, likeRatio, shareRatio, desc) {
+  let score = 0;
+  let factors = [];
+
+  // מחיר נמוך — בודק מהכותרת
+  const descLow = (desc || '').toLowerCase();
+  if (descLow.includes('dollar') || descLow.includes('cheap') || descLow.includes('affordable')) {
+    score += 20;
+    factors.push({ text: 'מחיר נמוך', good: true });
+  } else {
+    score += 10;
+    factors.push({ text: 'מחיר לא ידוע', good: null });
+  }
+
+  // ויזואלי — הרבה צפיות = ויזואלי
+  if (avgViews > 500000) {
+    score += 25;
+    factors.push({ text: 'ויזואלי מאוד', good: true });
+  } else if (avgViews > 100000) {
+    score += 15;
+    factors.push({ text: 'ויזואלי', good: true });
+  } else {
+    score += 5;
+    factors.push({ text: 'פחות ויזואלי', good: false });
+  }
+
+  // אפקט עדר — שיתופים גבוהים
+  if (shareRatio > 0.02) {
+    score += 25;
+    factors.push({ text: 'אפקט עדר חזק', good: true });
+  } else if (shareRatio > 0.01) {
+    score += 15;
+    factors.push({ text: 'אפקט עדר בינוני', good: null });
+  } else {
+    score += 5;
+    factors.push({ text: 'אפקט עדר חלש', good: false });
+  }
+
+  // לא תלוי שפה
+  if (!descLow.includes('song') && !descLow.includes('music') && !descLow.includes('dance')) {
+    score += 20;
+    factors.push({ text: 'לא תלוי שפה', good: true });
+  } else {
+    score += 5;
+    factors.push({ text: 'תלוי תרבות', good: false });
+  }
+
+  // מספר סרטונים — לא עדיין פיק
+  if (videoCount < 100) {
+    score += 10;
+    factors.push({ text: 'מוקדם מאוד', good: true });
+  } else if (videoCount < 500) {
+    score += 5;
+    factors.push({ text: 'שלב עולה', good: null });
+  }
+
+  return { score: Math.min(100, score), factors };
 }
 
 function getPhase(score) {
@@ -270,6 +332,12 @@ function getScoreColor(score) {
   if (score <= 35) return '#3b82f6';
   if (score <= 60) return '#10b981';
   if (score <= 80) return '#f59e0b';
+  return '#ef4444';
+}
+
+function getIsraelColor(score) {
+  if (score >= 70) return '#10b981';
+  if (score >= 50) return '#f59e0b';
   return '#ef4444';
 }
 
@@ -291,146 +359,157 @@ async function runScan() {
   btnIcon.style.display = 'none';
   btnText.textContent = 'סורק...';
 
-  document.getElementById('table-body').innerHTML = '<div class="empty-state">⚡ סורק האשטגים — מושך דאטה אמיתי מטיקטוק...</div>';
   document.getElementById('alert-area').innerHTML = '';
-  document.getElementById('error-area').innerHTML = '';
-  document.getElementById('videos-section').innerHTML = '';
+  document.getElementById('products-area').innerHTML = '<div class="empty-state">⚡ מושך דאטה מטיקטוק...</div>';
 
-  const results = [];
+  const allProducts = [];
   let totalViewsAll = 0;
-  let errors = 0;
+  let done = 0;
 
-  for (const tag of HASHTAGS) {
+  for (const { tag, category } of HASHTAGS) {
+    // עדכן progress
+    document.getElementById('progress-area').innerHTML = `
+      <div class="progress-bar">
+        <div class="progress-text">סורק #${tag} — ${done}/${HASHTAGS.length}</div>
+        <div class="progress-bg"><div class="progress-fill" style="width:${(done/HASHTAGS.length)*100}%"></div></div>
+      </div>`;
+
     try {
       const data = await fetchHashtag(tag);
       const videos = data.aweme_list || [];
-      
-      let totalViews = 0, totalLikes = 0, totalShares = 0, totalComments = 0;
+
+      let totalViews = 0, totalLikes = 0, totalShares = 0;
       videos.forEach(v => {
         const s = v.statistics || {};
         totalViews += s.play_count || 0;
         totalLikes += s.digg_count || 0;
         totalShares += s.share_count || 0;
-        totalComments += s.comment_count || 0;
       });
 
-      const score = calcScore(videos.length, totalViews, totalLikes, totalShares);
       totalViewsAll += totalViews;
 
-      results.push({
+      // מצא את הסרטון הכי פופולרי
+      const topVideo = videos.sort((a,b) => (b.statistics?.play_count||0) - (a.statistics?.play_count||0))[0];
+      const topDesc = topVideo?.desc || '';
+      const productName = extractProductName(topDesc, tag);
+
+      const trendScore = calcTrendScore(videos.length, totalViews, totalLikes, totalShares);
+      const avgViews = videos.length > 0 ? totalViews / videos.length : 0;
+      const likeRatio = totalViews > 0 ? totalLikes / totalViews : 0;
+      const shareRatio = totalViews > 0 ? totalShares / totalViews : 0;
+      const { score: israelScore, factors } = calcIsraelScore(videos.length, avgViews, likeRatio, shareRatio, topDesc);
+
+      allProducts.push({
         tag,
+        category,
+        productName: productName || tag,
+        topDesc,
         videoCount: videos.length,
         totalViews,
         totalLikes,
         totalShares,
-        totalComments,
-        score,
-        topVideos: videos.sort((a,b) => (b.statistics?.play_count||0) - (a.statistics?.play_count||0)).slice(0,3)
+        avgViews,
+        likeRatio,
+        shareRatio,
+        trendScore,
+        israelScore,
+        factors,
+        topVideoViews: topVideo?.statistics?.play_count || 0,
       });
 
     } catch(e) {
-      errors++;
-      results.push({ tag, videoCount: 0, totalViews: 0, totalLikes: 0, totalShares: 0, score: 0, error: true, topVideos: [] });
+      // דלג על שגיאה
     }
 
-    // המתן קצת בין בקשות
+    done++;
     await new Promise(r => setTimeout(r, 800));
   }
 
-  // מיין לפי ניקוד
-  results.sort((a, b) => a.score - b.score);
+  // מיין לפי סבירות ישראל ואחר כך ניקוד טרנד
+  allProducts.sort((a,b) => (b.israelScore + b.trendScore) - (a.israelScore + a.trendScore));
 
   // עדכן סטטיסטיקות
-  const buyable = results.filter(r => r.score >= 36 && r.score <= 60).length;
-  document.getElementById('stat-buy').textContent = buyable;
+  const recommended = allProducts.filter(p => p.israelScore >= 60 && p.trendScore <= 60).length;
+  document.getElementById('stat-products').textContent = allProducts.length;
+  document.getElementById('stat-recommended').textContent = recommended;
   document.getElementById('stat-views').textContent = formatNum(totalViewsAll);
   document.getElementById('stat-time').textContent = new Date().toLocaleTimeString('he-IL', {hour:'2-digit',minute:'2-digit'});
 
-  // בנה טבלה
-  let html = '';
-  results.forEach((item, i) => {
-    if (item.error) {
-      html += `<div class="trend-row" style="animation-delay:${i*0.05}s">
-        <div><div class="hashtag">#${item.tag}</div></div>
-        <div class="metric" style="color:var(--red)">שגיאה</div>
-        <div>—</div><div>—</div><div>—</div><div>—</div><div>—</div>
-      </div>`;
-      return;
-    }
+  // הסר progress
+  document.getElementById('progress-area').innerHTML = '';
 
-    const phase = getPhase(item.score);
-    const color = getScoreColor(item.score);
+  // בנה כרטיסיות מוצרים
+  let html = '<div class="products-grid">';
+  allProducts.forEach((item, i) => {
+    const phase = getPhase(item.trendScore);
+    const trendColor = getScoreColor(item.trendScore);
+    const israelColor = getIsraelColor(item.israelScore);
+    const isHighlight = item.israelScore >= 60 && item.trendScore <= 60;
 
-    html += `<div class="trend-row" style="animation-delay:${i*0.05}s">
-      <div>
-        <div class="hashtag">#${item.tag}</div>
-      </div>
-      <div>
-        <div class="metric">${item.videoCount}</div>
-        <div class="metric-sub">סרטונים</div>
-      </div>
-      <div>
-        <div class="metric">${formatNum(item.totalViews)}</div>
-        <div class="metric-sub">צפיות</div>
-      </div>
-      <div>
-        <div class="metric">${formatNum(item.totalLikes)}</div>
-        <div class="metric-sub">לייקים</div>
-      </div>
-      <div>
-        <div class="metric">${formatNum(item.totalShares)}</div>
-        <div class="metric-sub">שיתופים</div>
-      </div>
-      <div class="score-wrap">
-        <div class="score-bar-bg">
-          <div class="score-bar-fill" style="width:${item.score}%;background:${color}"></div>
+    const factorsHtml = item.factors.map(f => 
+      `<span class="israel-factor ${f.good === true ? 'factor-good' : f.good === false ? 'factor-bad' : 'factor-neutral'}">${f.text}</span>`
+    ).join('');
+
+    html += `
+    <div class="product-card ${isHighlight ? 'highlight' : ''}" style="animation-delay:${i*0.08}s">
+      <div class="card-header">
+        <div>
+          <div class="product-name">${item.productName}</div>
+          <div class="product-hashtag">#${item.tag} · ${item.category}</div>
         </div>
-        <div class="score-num" style="color:${color}">${item.score}</div>
+        <span class="phase-badge ${phase.cls}">${phase.label}</span>
       </div>
-      <div><span class="phase-badge ${phase.cls}">${phase.label}</span></div>
+
+      ${item.topDesc ? `<div class="card-desc">${item.topDesc.substring(0,100)}...</div>` : ''}
+
+      <div class="card-metrics">
+        <div class="metric-box">
+          <div class="metric-box-val">${item.videoCount}</div>
+          <div class="metric-box-label">סרטונים</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-box-val">${formatNum(item.totalViews)}</div>
+          <div class="metric-box-label">צפיות</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-box-val">${formatNum(item.topVideoViews)}</div>
+          <div class="metric-box-label">פיק סרטון</div>
+        </div>
+      </div>
+
+      <div class="score-row">
+        <div class="score-label">ניקוד טרנד</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:${item.trendScore}%;background:${trendColor}"></div></div>
+        <div class="score-num" style="color:${trendColor}">${item.trendScore}</div>
+      </div>
+
+      <div class="israel-score">
+        <div class="israel-label">
+          <span>סבירות הגעה לישראל</span>
+          <span style="color:${israelColor};font-weight:700">${item.israelScore}%</span>
+        </div>
+        <div class="israel-bar-bg">
+          <div class="israel-bar-fill" style="width:${item.israelScore}%;background:${israelColor}"></div>
+        </div>
+        <div class="israel-factors">${factorsHtml}</div>
+      </div>
     </div>`;
   });
+  html += '</div>';
 
-  document.getElementById('table-body').innerHTML = html;
+  document.getElementById('products-area').innerHTML = html;
 
-  // התראות
-  const best = results.filter(r => r.score >= 36 && r.score <= 55 && !r.error);
+  // התראה
+  const best = allProducts.filter(p => p.israelScore >= 65 && p.trendScore >= 30 && p.trendScore <= 60);
   if (best.length > 0) {
-    const names = best.map(b => '#' + b.tag).join(', ');
+    const names = best.map(b => b.productName).join(', ');
     document.getElementById('alert-area').innerHTML = `
       <div class="alert-box">
         <div style="font-size:20px">🎯</div>
         <div class="alert-text">
-          <strong>חלון הזמנה פתוח:</strong> ${names} — כדאי לחקור עכשיו לפני שמאוחר מדי
+          <strong>מומלצים לבדיקה מיידית:</strong> ${names} — סבירות גבוהה להגיע לישראל בקרוב
         </div>
       </div>`;
-  }
-
-  // סרטונים מובילים
-  const topResult = results.filter(r => !r.error && r.topVideos.length > 0).sort((a,b) => b.totalViews - a.totalViews)[0];
-  if (topResult) {
-    let vHtml = `<div class="top-video">
-      <div class="top-video-title">🔥 סרטונים מובילים — #${topResult.tag}</div>`;
-    topResult.topVideos.forEach(v => {
-      const s = v.statistics || {};
-      const desc = (v.desc || '').substring(0, 70);
-      const likeRatio = s.play_count > 0 ? ((s.digg_count / s.play_count) * 100).toFixed(1) : 0;
-      vHtml += `<div class="video-item">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);min-width:80px">${formatNum(s.play_count)} 👁</div>
-        <div class="video-desc">${desc}</div>
-        <div class="video-stats">
-          <span>❤️ ${formatNum(s.digg_count)}</span>
-          <span>↗️ ${formatNum(s.share_count)}</span>
-          <span class="${parseFloat(likeRatio) > 5 ? 'video-stat-good' : ''}">${likeRatio}% לייקים</span>
-        </div>
-      </div>`;
-    });
-    vHtml += '</div>';
-    document.getElementById('videos-section').innerHTML = vHtml;
-  }
-
-  if (errors > 0) {
-    document.getElementById('error-area').innerHTML = `<div class="error-box">⚠️ ${errors} האשטגים נכשלו — ייתכן שנגמרו הקרדיטים או שגיאת רשת</div>`;
   }
 
   btn.disabled = false;
