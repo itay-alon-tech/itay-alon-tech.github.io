@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrendScanner IL</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Heebo', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+  header { padding: 28px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+  .logo-text span { color: var(--accent); }
+  .status-badge { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+
+  .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .stat-label { font-size: 11px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .stat-value { font-size: 26px; font-weight: 900; color: var(--accent); font-family: var(--mono); }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .phase-legend { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+  .phase-pill { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; border: 1px solid; }
+  .phase-pill.p1 { background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#93c5fd }
+  .phase-pill.p2 { background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:#6ee7b7 }
+  .phase-pill.p3 { background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:#fcd34d }
+  .phase-pill.p4 { background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#fca5a5 }
+  .phase-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .p1 .phase-dot{background:#3b82f6}.p2 .phase-dot{background:#10b981}.p3 .phase-dot{background:#f59e0b}.p4 .phase-dot{background:#ef4444}
+
+  .scan-section { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .section-title { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 10px; flex: 1; }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+  .scan-btn { display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; padding: 11px 24px; border-radius: 10px; font-size: 14px; font-weight: 700; font-family: var(--sans); cursor: pointer; transition: opacity 0.2s; }
+  .scan-btn:hover { opacity: 0.9; }
+  .scan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  .trend-table { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+  .table-header { display: grid; grid-template-columns: 200px 1fr 1fr 1fr 1fr 1fr 130px; gap: 0; padding: 12px 20px; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .trend-row { display: grid; grid-template-columns: 200px 1fr 1fr 1fr 1fr 1fr 130px; gap: 0; padding: 16px 20px; border-bottom: 1px solid var(--border); align-items: center; transition: background 0.15s; animation: fadeIn 0.3s ease forwards; opacity: 0; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-row:hover { background: rgba(255,255,255,0.02); }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)} }
+
+  .hashtag { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--accent); }
+  .hashtag-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .metric { font-family: var(--mono); font-size: 12px; color: var(--text); }
+  .metric-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .growth { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+  .growth.up { color: var(--green); }
+  .growth.down { color: var(--red); }
+  .growth.neutral { color: var(--muted); }
+
+  .score-wrap { display: flex; align-items: center; gap: 8px; }
+  .score-bar-bg { flex:1; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .score-bar-fill { height:100%; border-radius:2px; }
+  .score-num { font-family:var(--mono); font-size:12px; font-weight:600; min-width:22px; }
+
+  .phase-badge { padding: 3px 9px; border-radius: 6px; font-size: 10px; font-weight: 600; font-family: var(--mono); text-align: center; white-space: nowrap; }
+  .phase-badge.p1{background:rgba(59,130,246,0.15);color:#93c5fd}
+  .phase-badge.p2{background:rgba(16,185,129,0.15);color:#6ee7b7}
+  .phase-badge.p3{background:rgba(245,158,11,0.15);color:#fcd34d}
+  .phase-badge.p4{background:rgba(239,68,68,0.15);color:#fca5a5}
+
+  .alert-box { background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:14px 18px; margin-bottom:24px; display:flex; align-items:flex-start; gap:12px; }
+  .alert-text { font-size:13px; color:#6ee7b7; line-height:1.5; }
+  .alert-text strong { font-weight:700; }
+
+  .error-box { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:12px; padding:14px 18px; margin-bottom:24px; font-size:13px; color:#fca5a5; }
+
+  .top-video { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 8px; }
+  .top-video-title { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .video-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .video-item:last-child { border-bottom: none; }
+  .video-desc { color: var(--text); flex: 1; margin-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .video-stats { display: flex; gap: 16px; font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .video-stat-good { color: var(--green); }
+
+  footer { border-top:1px solid var(--border); padding:20px 0; margin-top:32px; display:flex; justify-content:space-between; align-items:center; }
+  .footer-text { font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .version { font-family:var(--mono); font-size:11px; color:var(--border); background:var(--surface); border:1px solid var(--border); padding:3px 10px; border-radius:6px; }
+
+  .empty-state { padding:40px; text-align:center; color:var(--muted); font-family:var(--mono); font-size:13px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">📡</div>
+        <div class="logo-text">Trend<span>Scanner</span> IL</div>
+      </div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        דאטה אמיתי מטיקטוק
+      </div>
+    </div>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">האשטגים במעקב</div>
+      <div class="stat-value" id="stat-total">12</div>
+      <div class="stat-sub">סריקה שבועית</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">חלון הזמנה</div>
+      <div class="stat-value" style="color:var(--green)" id="stat-buy">—</div>
+      <div class="stat-sub">ניקוד 36–60</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">סה"כ צפיות</div>
+      <div class="stat-value" style="color:var(--amber);font-size:18px;padding-top:4px" id="stat-views">—</div>
+      <div class="stat-sub">בסריקה הנוכחית</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">סריקה אחרונה</div>
+      <div class="stat-value" style="font-size:15px;padding-top:6px" id="stat-time">—</div>
+      <div class="stat-sub">לחץ סרוק לעדכון</div>
+    </div>
+  </div>
+
+  <div class="scan-section">
+    <div class="section-title">תוצאות סריקה</div>
+    <button class="scan-btn" id="scan-btn" onclick="runScan()">
+      <span id="btn-icon">⚡</span>
+      <div class="spinner" id="spinner"></div>
+      <span id="btn-text">סרוק עכשיו</span>
+    </button>
+  </div>
+
+  <div id="alert-area"></div>
+  <div id="error-area"></div>
+
+  <div class="phase-legend">
+    <div class="phase-pill p1"><div class="phase-dot"></div>גל ראשון (0–35)</div>
+    <div class="phase-pill p2"><div class="phase-dot"></div>הזמן להזמין (36–60)</div>
+    <div class="phase-pill p3"><div class="phase-dot"></div>מתפוצץ — סיכון (61–80)</div>
+    <div class="phase-pill p4"><div class="phase-dot"></div>פיק / פספסת (81–100)</div>
+  </div>
+
+  <div class="trend-table">
+    <div class="table-header">
+      <div>האשטג</div>
+      <div>סרטונים</div>
+      <div>צפיות סה"כ</div>
+      <div>לייקים</div>
+      <div>שיתופים</div>
+      <div>ניקוד</div>
+      <div>שלב</div>
+    </div>
+    <div id="table-body">
+      <div class="empty-state">לחץ "סרוק עכשיו" להתחיל — דאטה אמיתי מטיקטוק</div>
+    </div>
+  </div>
+
+  <div id="videos-section"></div>
+
+  <footer>
+    <div class="footer-text">TrendScanner IL © 2026 — מבוסס על דאטה אמיתי מטיקטוק</div>
+    <div class="version">v2.0 — Live Data</div>
+  </footer>
+</div>
+
+<script>
+const API_KEY = 'T1SPIJ1MNZUq3Zl7zgp2b0wng1V2';
+const API_BASE = 'https://api.scrapecreators.com/v1/tiktok';
+
+// רשימת האשטגים לסריקה
+const HASHTAGS = [
+  'toysoftiktok',
+  'fidgettoys',
+  'blindbox',
+  'kidstoys',
+  'magnetictoys',
+  'squishmallow',
+  'popitchallenge',
+  'miniverse',
+  'smiggle',
+  'cardcapture',
+  'waterbead',
+  'labubu'
+];
+
+function formatNum(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(0) + 'K';
+  return n.toString();
+}
+
+function calcScore(videos, totalViews, totalLikes, totalShares) {
+  let score = 0;
+  
+  // קריטריון 1: מספר סרטונים (20 נק')
+  if (videos < 100) score += 20;
+  else if (videos < 1000) score += 15;
+  else if (videos < 10000) score += 10;
+  else if (videos < 100000) score += 5;
+  else score += 2;
+
+  // קריטריון 2: ממוצע צפיות לסרטון (25 נק')
+  const avgViews = videos > 0 ? totalViews / videos : 0;
+  if (avgViews > 500000) score += 25;
+  else if (avgViews > 100000) score += 20;
+  else if (avgViews > 50000) score += 15;
+  else if (avgViews > 10000) score += 10;
+  else score += 5;
+
+  // קריטריון 3: יחס לייקים לצפיות (20 נק')
+  const likeRatio = totalViews > 0 ? totalLikes / totalViews : 0;
+  if (likeRatio > 0.08) score += 20;
+  else if (likeRatio > 0.05) score += 15;
+  else if (likeRatio > 0.03) score += 10;
+  else score += 5;
+
+  // קריטריון 4: שיתופים (15 נק')
+  const shareRatio = totalViews > 0 ? totalShares / totalViews : 0;
+  if (shareRatio > 0.02) score += 15;
+  else if (shareRatio > 0.01) score += 10;
+  else score += 5;
+
+  // קריטריון 5: לא בישראל עדיין (20 נק' — קבוע לעכשיו)
+  score += 15;
+
+  return Math.min(100, score);
+}
+
+function getPhase(score) {
+  if (score <= 35) return { label: 'גל ראשון', cls: 'p1' };
+  if (score <= 60) return { label: 'הזמן להזמין', cls: 'p2' };
+  if (score <= 80) return { label: 'מתפוצץ', cls: 'p3' };
+  return { label: 'פיק', cls: 'p4' };
+}
+
+function getScoreColor(score) {
+  if (score <= 35) return '#3b82f6';
+  if (score <= 60) return '#10b981';
+  if (score <= 80) return '#f59e0b';
+  return '#ef4444';
+}
+
+async function fetchHashtag(hashtag) {
+  const url = `${API_BASE}/search/hashtag?hashtag=${encodeURIComponent(hashtag)}&region=US`;
+  const res = await fetch(url, { headers: { 'x-api-key': API_KEY } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+}
+
+async function runScan() {
+  const btn = document.getElementById('scan-btn');
+  const spinner = document.getElementById('spinner');
+  const btnIcon = document.getElementById('btn-icon');
+  const btnText = document.getElementById('btn-text');
+
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  btnIcon.style.display = 'none';
+  btnText.textContent = 'סורק...';
+
+  document.getElementById('table-body').innerHTML = '<div class="empty-state">⚡ סורק האשטגים — מושך דאטה אמיתי מטיקטוק...</div>';
+  document.getElementById('alert-area').innerHTML = '';
+  document.getElementById('error-area').innerHTML = '';
+  document.getElementById('videos-section').innerHTML = '';
+
+  const results = [];
+  let totalViewsAll = 0;
+  let errors = 0;
+
+  for (const tag of HASHTAGS) {
+    try {
+      const data = await fetchHashtag(tag);
+      const videos = data.aweme_list || [];
+      
+      let totalViews = 0, totalLikes = 0, totalShares = 0, totalComments = 0;
+      videos.forEach(v => {
+        const s = v.statistics || {};
+        totalViews += s.play_count || 0;
+        totalLikes += s.digg_count || 0;
+        totalShares += s.share_count || 0;
+        totalComments += s.comment_count || 0;
+      });
+
+      const score = calcScore(videos.length, totalViews, totalLikes, totalShares);
+      totalViewsAll += totalViews;
+
+      results.push({
+        tag,
+        videoCount: videos.length,
+        totalViews,
+        totalLikes,
+        totalShares,
+        totalComments,
+        score,
+        topVideos: videos.sort((a,b) => (b.statistics?.play_count||0) - (a.statistics?.play_count||0)).slice(0,3)
+      });
+
+    } catch(e) {
+      errors++;
+      results.push({ tag, videoCount: 0, totalViews: 0, totalLikes: 0, totalShares: 0, score: 0, error: true, topVideos: [] });
+    }
+
+    // המתן קצת בין בקשות
+    await new Promise(r => setTimeout(r, 800));
+  }
+
+  // מיין לפי ניקוד
+  results.sort((a, b) => a.score - b.score);
+
+  // עדכן סטטיסטיקות
+  const buyable = results.filter(r => r.score >= 36 && r.score <= 60).length;
+  document.getElementById('stat-buy').textContent = buyable;
+  document.getElementById('stat-views').textContent = formatNum(totalViewsAll);
+  document.getElementById('stat-time').textContent = new Date().toLocaleTimeString('he-IL', {hour:'2-digit',minute:'2-digit'});
+
+  // בנה טבלה
+  let html = '';
+  results.forEach((item, i) => {
+    if (item.error) {
+      html += `<div class="trend-row" style="animation-delay:${i*0.05}s">
+        <div><div class="hashtag">#${item.tag}</div></div>
+        <div class="metric" style="color:var(--red)">שגיאה</div>
+        <div>—</div><div>—</div><div>—</div><div>—</div><div>—</div>
+      </div>`;
+      return;
+    }
+
+    const phase = getPhase(item.score);
+    const color = getScoreColor(item.score);
+
+    html += `<div class="trend-row" style="animation-delay:${i*0.05}s">
+      <div>
+        <div class="hashtag">#${item.tag}</div>
+      </div>
+      <div>
+        <div class="metric">${item.videoCount}</div>
+        <div class="metric-sub">סרטונים</div>
+      </div>
+      <div>
+        <div class="metric">${formatNum(item.totalViews)}</div>
+        <div class="metric-sub">צפיות</div>
+      </div>
+      <div>
+        <div class="metric">${formatNum(item.totalLikes)}</div>
+        <div class="metric-sub">לייקים</div>
+      </div>
+      <div>
+        <div class="metric">${formatNum(item.totalShares)}</div>
+        <div class="metric-sub">שיתופים</div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-bar-bg">
+          <div class="score-bar-fill" style="width:${item.score}%;background:${color}"></div>
+        </div>
+        <div class="score-num" style="color:${color}">${item.score}</div>
+      </div>
+      <div><span class="phase-badge ${phase.cls}">${phase.label}</span></div>
+    </div>`;
+  });
+
+  document.getElementById('table-body').innerHTML = html;
+
+  // התראות
+  const best = results.filter(r => r.score >= 36 && r.score <= 55 && !r.error);
+  if (best.length > 0) {
+    const names = best.map(b => '#' + b.tag).join(', ');
+    document.getElementById('alert-area').innerHTML = `
+      <div class="alert-box">
+        <div style="font-size:20px">🎯</div>
+        <div class="alert-text">
+          <strong>חלון הזמנה פתוח:</strong> ${names} — כדאי לחקור עכשיו לפני שמאוחר מדי
+        </div>
+      </div>`;
+  }
+
+  // סרטונים מובילים
+  const topResult = results.filter(r => !r.error && r.topVideos.length > 0).sort((a,b) => b.totalViews - a.totalViews)[0];
+  if (topResult) {
+    let vHtml = `<div class="top-video">
+      <div class="top-video-title">🔥 סרטונים מובילים — #${topResult.tag}</div>`;
+    topResult.topVideos.forEach(v => {
+      const s = v.statistics || {};
+      const desc = (v.desc || '').substring(0, 70);
+      const likeRatio = s.play_count > 0 ? ((s.digg_count / s.play_count) * 100).toFixed(1) : 0;
+      vHtml += `<div class="video-item">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);min-width:80px">${formatNum(s.play_count)} 👁</div>
+        <div class="video-desc">${desc}</div>
+        <div class="video-stats">
+          <span>❤️ ${formatNum(s.digg_count)}</span>
+          <span>↗️ ${formatNum(s.share_count)}</span>
+          <span class="${parseFloat(likeRatio) > 5 ? 'video-stat-good' : ''}">${likeRatio}% לייקים</span>
+        </div>
+      </div>`;
+    });
+    vHtml += '</div>';
+    document.getElementById('videos-section').innerHTML = vHtml;
+  }
+
+  if (errors > 0) {
+    document.getElementById('error-area').innerHTML = `<div class="error-box">⚠️ ${errors} האשטגים נכשלו — ייתכן שנגמרו הקרדיטים או שגיאת רשת</div>`;
+  }
+
+  btn.disabled = false;
+  spinner.style.display = 'none';
+  btnIcon.style.display = 'inline';
+  btnText.textContent = 'סרוק שוב';
+}
+</script>
+</body>
+</html>
