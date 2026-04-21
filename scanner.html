@@ -7,219 +7,371 @@
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0d0d14;
-  --card: #13131f;
-  --border: #22223a;
-  --accent: #00d4ff;
-  --purple: #7c3aed;
-  --green: #10b981;
-  --amber: #f59e0b;
-  --red: #ef4444;
-  --text: #e8eaf0;
-  --muted: #5a6070;
-  --sans: 'Heebo', sans-serif;
-  --mono: 'IBM Plex Mono', monospace;
+  --bg:#0d0d14; --card:#13131f; --border:#22223a;
+  --accent:#00d4ff; --purple:#7c3aed;
+  --green:#10b981; --amber:#f59e0b; --red:#ef4444; --blue:#3b82f6;
+  --text:#e8eaf0; --muted:#5a6070;
+  --sans:'Heebo',sans-serif; --mono:'IBM Plex Mono',monospace;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:var(--bg); color:var(--text); font-family:var(--sans); min-height:100vh; direction:rtl; }
-
-.container { max-width:1100px; margin:0 auto; padding:0 20px; }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;direction:rtl;}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px;}
 
 /* Header */
-header { padding:24px 0 18px; border-bottom:1px solid var(--border); margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; }
-.logo { display:flex; align-items:center; gap:10px; }
-.logo-box { width:36px; height:36px; background:linear-gradient(135deg,var(--accent),var(--purple)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
-.logo-name { font-size:20px; font-weight:900; }
-.logo-name em { color:var(--accent); font-style:normal; }
-.live-dot { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
-.dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 2s infinite; }
-@keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+header{padding:22px 0 16px;border-bottom:1px solid var(--border);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-box{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.logo-name{font-size:19px;font-weight:900;}
+.logo-name em{color:var(--accent);font-style:normal;}
+.live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* Hashtag manager */
-.manager { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:20px; }
-.manager-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-.manager-label { font-size:13px; font-weight:700; }
-.manager-counter { font-size:11px; color:var(--muted); font-family:var(--mono); }
-.manager-counter b { color:var(--accent); }
-.tags-wrap { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px; min-height:32px; }
-.tag-chip { display:flex; align-items:center; gap:5px; background:var(--bg); border:1px solid var(--border); border-radius:7px; padding:4px 10px; font-size:12px; font-family:var(--mono); color:var(--accent); }
-.tag-chip.dual { border-color:rgba(124,58,237,.4); }
-.chip-platform { font-size:9px; color:var(--muted); background:rgba(255,255,255,.05); padding:1px 5px; border-radius:4px; }
-.chip-x { cursor:pointer; color:var(--muted); font-size:15px; line-height:1; }
-.chip-x:hover { color:var(--red); }
-.add-row { display:flex; gap:8px; }
-.add-input { flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:7px 12px; font-size:13px; color:var(--text); outline:none; }
-.add-input:focus { border-color:var(--accent); }
-.add-input::placeholder { color:var(--muted); }
-.add-sel { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:7px 10px; font-size:12px; color:var(--text); outline:none; cursor:pointer; }
-.add-btn { background:var(--accent); color:#000; border:none; border-radius:8px; padding:7px 16px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
-.add-btn:hover { opacity:.85; }
-.max-warn { font-size:11px; color:var(--amber); margin-top:7px; display:none; }
+/* Score legend bar */
+.legend-bar{display:flex;border-radius:10px;overflow:hidden;margin-bottom:20px;border:1px solid var(--border);}
+.leg-seg{flex:1;padding:10px 14px;}
+.leg-seg.l1{background:rgba(59,130,246,.12);}
+.leg-seg.l2{background:rgba(16,185,129,.12);}
+.leg-seg.l3{background:rgba(245,158,11,.12);}
+.leg-seg.l4{background:rgba(239,68,68,.12);}
+.leg-range{font-family:var(--mono);font-size:13px;font-weight:700;}
+.l1 .leg-range{color:#93c5fd;}
+.l2 .leg-range{color:#6ee7b7;}
+.l3 .leg-range{color:#fcd34d;}
+.l4 .leg-range{color:#fca5a5;}
+.leg-label{font-size:11px;color:var(--muted);margin-top:2px;}
+.leg-action{font-size:11px;font-weight:600;margin-top:3px;}
+.l1 .leg-action{color:#93c5fd;}
+.l2 .leg-action{color:#6ee7b7;}
+.l3 .leg-action{color:#fcd34d;}
+.l4 .leg-action{color:#fca5a5;}
 
-/* Top stats */
-.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
-.stat { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; }
-.stat-lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
-.stat-val { font-size:24px; font-weight:900; color:var(--accent); font-family:var(--mono); }
-.stat-sub { font-size:10px; color:var(--muted); margin-top:3px; }
+/* Tabs */
+.tabs{display:flex;gap:6px;margin-bottom:16px;}
+.tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);transition:all .15s;}
+.tab.active{background:var(--accent);color:#000;border-color:transparent;}
 
-/* Scan bar */
-.scan-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-.scan-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
-.scan-btn { display:flex; align-items:center; gap:8px; background:linear-gradient(135deg,var(--accent),var(--purple)); color:#fff; border:none; padding:10px 22px; border-radius:9px; font-size:14px; font-weight:700; cursor:pointer; }
-.scan-btn:hover { opacity:.9; }
-.scan-btn:disabled { opacity:.45; cursor:not-allowed; }
-.spin { width:13px; height:13px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; display:none; }
-@keyframes spin { to{transform:rotate(360deg)} }
+/* Criteria guide */
+.criteria-guide{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:20px;}
+.criteria-title{font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text);}
+.criteria-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.crit-item{background:var(--bg);border-radius:8px;padding:10px 12px;}
+.crit-name{font-size:12px;font-weight:700;margin-bottom:4px;}
+.crit-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+.crit-vals{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
+.crit-val{font-size:10px;padding:2px 7px;border-radius:4px;display:inline-block;width:fit-content;}
+.cv-good{background:rgba(16,185,129,.12);color:#6ee7b7;}
+.cv-ok{background:rgba(245,158,11,.1);color:#fcd34d;}
+.cv-bad{background:rgba(239,68,68,.1);color:#fca5a5;}
+
+/* Manager */
+.manager{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:18px;}
+.manager-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.manager-lbl{font-size:13px;font-weight:700;}
+.manager-cnt{font-size:11px;color:var(--muted);font-family:var(--mono);}
+.manager-cnt b{color:var(--accent);}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;min-height:30px;}
+.chip{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:12px;font-family:var(--mono);color:var(--accent);}
+.chip.dual{border-color:rgba(124,58,237,.4);}
+.chip-plat{font-size:9px;color:var(--muted);background:rgba(255,255,255,.05);padding:1px 5px;border-radius:4px;}
+.chip-x{cursor:pointer;color:var(--muted);font-size:15px;line-height:1;}
+.chip-x:hover{color:var(--red);}
+.add-row{display:flex;gap:8px;}
+.add-in{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--text);outline:none;}
+.add-in:focus{border-color:var(--accent);}
+.add-in::placeholder{color:var(--muted);}
+.add-sel{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--text);outline:none;cursor:pointer;}
+.add-btn{background:var(--accent);color:#000;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;}
+.add-btn:hover{opacity:.85;}
+.max-warn{font-size:11px;color:var(--amber);margin-top:7px;display:none;}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.stat-val{font-size:22px;font-weight:900;color:var(--accent);font-family:var(--mono);}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* Scan */
+.scan-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.scan-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.scan-btn{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border:none;padding:10px 22px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;}
+.scan-btn:hover{opacity:.9;}
+.scan-btn:disabled{opacity:.45;cursor:not-allowed;}
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* Progress */
-.prog { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 18px; margin-bottom:16px; }
-.prog-txt { font-size:12px; color:var(--muted); font-family:var(--mono); margin-bottom:7px; }
-.prog-track { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
-.prog-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--purple)); border-radius:2px; transition:width .3s; }
+.prog{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:14px;}
+.prog-txt{font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:7px;}
+.prog-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:2px;transition:width .3s;}
 
 /* Alert */
-.alert { background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.3); border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:13px; color:#6ee7b7; line-height:1.5; }
-.alert b { font-weight:700; }
+.alert{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:#6ee7b7;line-height:1.5;}
+.alert b{font-weight:700;}
 
-/* Product cards */
-.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:14px; margin-bottom:28px; }
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-bottom:28px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;animation:up .35s ease forwards;opacity:0;}
+.card.opp{border-color:rgba(16,185,129,.45);}
+.card.late{border-color:rgba(239,68,68,.25);}
+@keyframes up{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
 
-.card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; animation:up .35s ease forwards; opacity:0; }
-.card.opp { border-color:rgba(16,185,129,.45); background:rgba(16,185,129,.03); }
-.card.late { border-color:rgba(239,68,68,.25); }
-@keyframes up { from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)} }
+/* Card header stripe */
+.card-stripe{height:4px;width:100%;}
 
-/* Card top */
-.card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
-.card-name { font-size:14px; font-weight:700; line-height:1.3; flex:1; margin-left:8px; }
-.card-tag { font-size:10px; color:var(--muted); font-family:var(--mono); margin-bottom:10px; }
+/* Card body */
+.card-body{padding:16px;}
 
-/* Summary box — most important */
-.summary { border-radius:9px; padding:10px 14px; margin-bottom:12px; font-size:13px; line-height:1.5; font-weight:500; }
-.summary.go { background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.25); color:#6ee7b7; }
-.summary.wait { background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2); color:#fcd34d; }
-.summary.stop { background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); color:#fca5a5; }
-.summary.baby { background:rgba(100,116,139,.08); border:1px solid rgba(100,116,139,.2); color:var(--muted); }
+/* Product name — big and clear */
+.product-name{font-size:16px;font-weight:900;color:var(--text);margin-bottom:2px;line-height:1.3;}
+.product-source{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:12px;}
 
-/* Metrics row */
-.metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:12px; }
-.m { background:var(--bg); border-radius:7px; padding:7px; text-align:center; }
-.m-val { font-size:13px; font-weight:700; font-family:var(--mono); }
-.m-lbl { font-size:9px; color:var(--muted); margin-top:2px; }
+/* Bottom line — most important */
+.bottom-line{border-radius:9px;padding:11px 14px;margin-bottom:14px;}
+.bl-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;opacity:.7;}
+.bl-text{font-size:13px;font-weight:600;line-height:1.4;}
+.bl-action{font-size:12px;margin-top:6px;font-weight:700;}
+.bl-go{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#6ee7b7;}
+.bl-wait{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:#fcd34d;}
+.bl-stop{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#fca5a5;}
+.bl-info{background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.2);color:var(--muted);}
 
-/* Scores */
-.scores { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
-.score-row { display:flex; align-items:center; gap:8px; }
-.score-lbl { font-size:11px; color:var(--muted); width:100px; flex-shrink:0; }
-.score-track { flex:1; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
-.score-fill { height:100%; border-radius:2px; }
-.score-n { font-size:11px; font-weight:700; font-family:var(--mono); width:28px; text-align:left; }
+/* Score section */
+.score-section{margin-bottom:12px;}
+.score-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.score-lbl{font-size:11px;color:var(--muted);width:95px;flex-shrink:0;}
+.score-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;position:relative;}
+.score-fill{height:100%;border-radius:3px;}
+.score-markers{position:relative;height:8px;margin-top:2px;}
+.score-marker{position:absolute;font-size:9px;color:var(--muted);transform:translateX(50%);}
+.score-n{font-size:12px;font-weight:700;font-family:var(--mono);width:30px;text-align:left;}
 
-/* Platform row */
-.platforms { display:flex; gap:7px; margin-bottom:10px; }
-.plat { display:flex; align-items:center; gap:5px; background:var(--bg); border-radius:7px; padding:5px 10px; font-size:11px; }
-.plat-icon { font-size:12px; }
-.plat-val { font-weight:700; color:var(--text); font-family:var(--mono); }
-.plat-lbl { color:var(--muted); }
+/* Mini metrics */
+.mini-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+.mm{background:var(--bg);border-radius:7px;padding:7px;text-align:center;}
+.mm-val{font-size:13px;font-weight:700;font-family:var(--mono);}
+.mm-lbl{font-size:9px;color:var(--muted);margin-top:2px;}
 
-/* Tags */
-.tag-row { display:flex; flex-wrap:wrap; gap:5px; }
-.badge { font-size:10px; padding:2px 9px; border-radius:20px; font-weight:600; }
-.b-green { background:rgba(16,185,129,.12); color:#6ee7b7; }
-.b-red { background:rgba(239,68,68,.12); color:#fca5a5; }
-.b-amber { background:rgba(245,158,11,.12); color:#fcd34d; }
-.b-blue { background:rgba(59,130,246,.12); color:#93c5fd; }
-.b-gray { background:rgba(100,116,139,.12); color:var(--muted); }
+/* Platforms */
+.plats{display:flex;gap:6px;margin-bottom:12px;}
+.plat{display:flex;align-items:center;gap:5px;background:var(--bg);border-radius:7px;padding:5px 10px;font-size:11px;}
+.plat-val{font-weight:700;font-family:var(--mono);}
+.plat-lbl{color:var(--muted);}
 
-.empty { padding:50px; text-align:center; color:var(--muted); font-size:13px; font-family:var(--mono); }
+/* Criteria tags */
+.crits{display:flex;flex-wrap:wrap;gap:4px;}
+.crit-tag{font-size:10px;padding:2px 8px;border-radius:20px;}
+.ct-good{background:rgba(16,185,129,.1);color:#6ee7b7;}
+.ct-bad{background:rgba(239,68,68,.1);color:#fca5a5;}
+.ct-ok{background:rgba(100,116,139,.1);color:var(--muted);}
 
-footer { border-top:1px solid var(--border); padding:16px 0; margin-top:24px; display:flex; justify-content:space-between; font-size:11px; color:var(--muted); font-family:var(--mono); }
+.badge{font-size:10px;padding:2px 9px;border-radius:20px;font-weight:600;}
+.b-green{background:rgba(16,185,129,.12);color:#6ee7b7;}
+.b-red{background:rgba(239,68,68,.12);color:#fca5a5;}
+.b-amber{background:rgba(245,158,11,.12);color:#fcd34d;}
+.b-blue{background:rgba(59,130,246,.12);color:#93c5fd;}
+.b-gray{background:rgba(100,116,139,.12);color:var(--muted);}
+
+.empty{padding:50px;text-align:center;color:var(--muted);font-size:13px;font-family:var(--mono);}
+footer{border-top:1px solid var(--border);padding:14px 0;margin-top:20px;display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:var(--mono);}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
 
 <header>
   <div class="logo">
     <div class="logo-box">📡</div>
     <div class="logo-name">Trend<em>Scanner</em> IL</div>
   </div>
-  <div class="live-dot"><div class="dot"></div> פעיל — טיקטוק + אינסטגרם</div>
+  <div class="live"><div class="dot"></div> פעיל — טיקטוק + אינסטגרם</div>
 </header>
 
-<!-- ניהול האשטגים -->
-<div class="manager">
-  <div class="manager-top">
-    <div class="manager-label">⚙️ האשטגים במעקב</div>
-    <div class="manager-counter"><b id="tag-count">0</b> / 20 האשטגים</div>
-  </div>
-  <div class="tags-wrap" id="tags-wrap"></div>
-  <div class="add-row">
-    <input class="add-input" id="tag-input" placeholder="הוסף האשטג חדש..." onkeydown="if(event.key==='Enter')addTag()" />
-    <select class="add-sel" id="plat-sel">
-      <option value="both">TikTok + Instagram</option>
-      <option value="tiktok">TikTok בלבד</option>
-    </select>
-    <button class="add-btn" onclick="addTag()">+ הוסף</button>
-  </div>
-  <div class="max-warn" id="max-warn">⚠️ הגעת למקסימום 20 האשטגים</div>
+<!-- טאבים -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('scan',this)">📊 סריקה</div>
+  <div class="tab" onclick="showTab('guide',this)">📖 מדריך קריטריונים</div>
+  <div class="tab" onclick="showTab('tags',this)">⚙️ ניהול האשטגים</div>
 </div>
 
-<!-- סטטיסטיקות -->
-<div class="stats">
-  <div class="stat">
-    <div class="stat-lbl">מוצרים שנסרקו</div>
-    <div class="stat-val" id="s-total">—</div>
-    <div class="stat-sub">בסריקה הנוכחית</div>
+<!-- טאב סריקה -->
+<div id="tab-scan">
+  <!-- סרגל ניקוד -->
+  <div class="legend-bar">
+    <div class="leg-seg l1">
+      <div class="leg-range">0–35</div>
+      <div class="leg-label">גל ראשון</div>
+      <div class="leg-action">עקוב, עוד לא לפעול</div>
+    </div>
+    <div class="leg-seg l2">
+      <div class="leg-range">36–60</div>
+      <div class="leg-label">עולה</div>
+      <div class="leg-action">זמן לחקור ולהזמין</div>
+    </div>
+    <div class="leg-seg l3">
+      <div class="leg-range">61–80</div>
+      <div class="leg-label">מתפוצץ</div>
+      <div class="leg-action">מאוחר — סיכון גבוה</div>
+    </div>
+    <div class="leg-seg l4">
+      <div class="leg-range">81–100</div>
+      <div class="leg-label">פיק / ירידה</div>
+      <div class="leg-action">פספסת את הרכבת</div>
+    </div>
   </div>
-  <div class="stat">
-    <div class="stat-lbl">הזדמנויות פעילות</div>
-    <div class="stat-val" style="color:var(--green)" id="s-opps">—</div>
-    <div class="stat-sub">לא בישראל + חלון פתוח</div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-lbl">מוצרים שנסרקו</div>
+      <div class="stat-val" id="s-total">—</div>
+      <div class="stat-sub">בסריקה הנוכחית</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">הזדמנויות</div>
+      <div class="stat-val" style="color:var(--green)" id="s-opps">—</div>
+      <div class="stat-sub">לא בישראל + חלון פתוח</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">כבר בישראל</div>
+      <div class="stat-val" style="color:var(--red)" id="s-il">—</div>
+      <div class="stat-sub">מאוחר מדי</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">סריקה אחרונה</div>
+      <div class="stat-val" style="font-size:16px;padding-top:4px" id="s-time">—</div>
+      <div class="stat-sub">פעם בשבוע מומלץ</div>
+    </div>
   </div>
-  <div class="stat">
-    <div class="stat-lbl">כבר בישראל</div>
-    <div class="stat-val" style="color:var(--red)" id="s-il">—</div>
-    <div class="stat-sub">מאוחר מדי להזמין</div>
+
+  <div class="scan-bar">
+    <div class="scan-lbl">תוצאות</div>
+    <button class="scan-btn" id="scan-btn" onclick="runScan()">
+      <span id="btn-icon">⚡</span>
+      <div class="spin" id="spin"></div>
+      <span id="btn-txt">סרוק עכשיו</span>
+    </button>
   </div>
-  <div class="stat">
-    <div class="stat-lbl">סריקה אחרונה</div>
-    <div class="stat-val" style="font-size:16px;padding-top:4px" id="s-time">—</div>
-    <div class="stat-sub">פעם בשבוע מומלץ</div>
+
+  <div id="alert-area"></div>
+  <div id="prog-area"></div>
+  <div id="results"><div class="empty">לחץ "סרוק עכשיו" כדי להתחיל</div></div>
+</div>
+
+<!-- טאב מדריך קריטריונים -->
+<div id="tab-guide" style="display:none">
+  <div class="criteria-guide">
+    <div class="criteria-title">📖 כל הקריטריונים שהכלי בודק — ומה כל אחד אומר</div>
+    <div class="criteria-grid">
+      <div class="crit-item">
+        <div class="crit-name" style="color:#93c5fd">מספר סרטונים בטיקטוק</div>
+        <div class="crit-desc">כמה סרטונים קיימים עם ה-האשטג. פחות = מוקדם יותר.</div>
+        <div class="crit-vals">
+          <span class="crit-val cv-good">מתחת 50 — מוקדם מאוד ✓</span>
+          <span class="crit-val cv-ok">50–500 — שלב עולה</span>
+          <span class="crit-val cv-bad">מעל 1,000 — מתקדם</span>
+        </div>
+      </div>
+      <div class="crit-item">
+        <div class="crit-name" style="color:#6ee7b7">ממוצע צפיות לסרטון</div>
+        <div class="crit-desc">אם יש מעט סרטונים אבל הרבה צפיות — הסרטון ויראלי ומשך תשומת לב.</div>
+        <div class="crit-vals">
+          <span class="crit-val cv-good">מעל 500K — ויזואלי מאוד ✓</span>
+          <span class="crit-val cv-ok">100K–500K — ויזואלי</span>
+          <span class="crit-val cv-bad">מתחת 50K — פחות ויזואלי</span>
+        </div>
+      </div>
+      <div class="crit-item">
+        <div class="crit-name" style="color:#fcd34d">יחס לייקים לצפיות</div>
+        <div class="crit-desc">אנשים לא רק צופים — הם גם אוהבים. אחוז לייקים גבוה = ביקוש אמיתי.</div>
+        <div class="crit-vals">
+          <span class="crit-val cv-good">מעל 8% — ביקוש חזק ✓</span>
+          <span class="crit-val cv-ok">3%–8% — ביקוש בינוני</span>
+          <span class="crit-val cv-bad">מתחת 3% — ביקוש חלש</span>
+        </div>
+      </div>
+      <div class="crit-item">
+        <div class="crit-name" style="color:#fca5a5">אפקט עדר — שיתופים</div>
+        <div class="crit-desc">אנשים ששיתפו הם אנשים שאמרו לחבר "תראה את זה". זה הסימן לטרנד כיתתי.</div>
+        <div class="crit-vals">
+          <span class="crit-val cv-good">מעל 2% — אפקט עדר חזק ✓</span>
+          <span class="crit-val cv-ok">1%–2% — אפקט עדר בינוני</span>
+          <span class="crit-val cv-bad">מתחת 1% — אפקט עדר חלש</span>
+        </div>
+      </div>
+      <div class="crit-item">
+        <div class="crit-name" style="color:#93c5fd">גיל קהל יעד</div>
+        <div class="crit-desc">מוצרים לגיל 5–14 מתאימים לאסטרטגיה שלנו. מוצרים לתינוקות לא מייצרים טרנד כיתתי.</div>
+        <div class="crit-vals">
+          <span class="crit-val cv-good">גיל 5–14 — מתאים ✓</span>
+          <span class="crit-val cv-bad">תינוקות / מבוגרים — לא רלוונטי</span>
+        </div>
+      </div>
+      <div class="crit-item">
+        <div class="crit-name" style="color:#6ee7b7">סטטוס ישראל</div>
+        <div class="crit-desc">האם המוצר כבר נמכר בחנויות ישראליות? אם כן — מאוחר מדי. אם לא — יש חלון.</div>
+        <div class="crit-vals">
+          <span class="crit-val cv-good">לא הגיע לישראל ✓</span>
+          <span class="crit-val cv-ok">לא ידוע — בדוק ידנית</span>
+          <span class="crit-val cv-bad">כבר בישראל — מאוחר מדי</span>
+        </div>
+      </div>
+      <div class="crit-item">
+        <div class="crit-name" style="color:#fcd34d">נוכחות באינסטגרם</div>
+        <div class="crit-desc">מוצר שעולה גם בטיקטוק וגם באינסטגרם — סימן חזק יותר לטרנד אמיתי שיגיע לישראל.</div>
+        <div class="crit-vals">
+          <span class="crit-val cv-good">מופיע בשתי פלטפורמות ✓</span>
+          <span class="crit-val cv-ok">רק טיקטוק — פחות בטוח</span>
+        </div>
+      </div>
+      <div class="crit-item">
+        <div class="crit-name" style="color:#fca5a5">ניקוד טרנד כולל</div>
+        <div class="crit-desc">ציון מ-0 עד 100 שמשקלל את כל הקריטריונים. הטווח האידיאלי להזמנה הוא 36–60.</div>
+        <div class="crit-vals">
+          <span class="crit-val cv-good">36–60 — הזמן להזמין ✓</span>
+          <span class="crit-val cv-ok">0–35 — עוד מוקדם</span>
+          <span class="crit-val cv-bad">61–100 — מאוחר מדי</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- כפתור סריקה -->
-<div class="scan-bar">
-  <div class="scan-label">תוצאות סריקה</div>
-  <button class="scan-btn" id="scan-btn" onclick="runScan()">
-    <span id="btn-icon">⚡</span>
-    <div class="spin" id="spin"></div>
-    <span id="btn-txt">סרוק עכשיו</span>
-  </button>
-</div>
-
-<div id="alert-area"></div>
-<div id="prog-area"></div>
-<div id="results">
-  <div class="empty">לחץ "סרוק עכשיו" כדי להתחיל</div>
+<!-- טאב ניהול האשטגים -->
+<div id="tab-tags" style="display:none">
+  <div class="manager">
+    <div class="manager-top">
+      <div class="manager-lbl">האשטגים במעקב</div>
+      <div class="manager-cnt"><b id="tag-count">0</b> / 20</div>
+    </div>
+    <div class="tags-wrap" id="tags-wrap"></div>
+    <div class="add-row">
+      <input class="add-in" id="tag-input" placeholder="הוסף האשטג חדש..." onkeydown="if(event.key==='Enter')addTag()" />
+      <select class="add-sel" id="plat-sel">
+        <option value="both">TikTok + Instagram</option>
+        <option value="tiktok">TikTok בלבד</option>
+      </select>
+      <button class="add-btn" onclick="addTag()">+ הוסף</button>
+    </div>
+    <div class="max-warn" id="max-warn">⚠️ הגעת למקסימום 20 האשטגים</div>
+  </div>
 </div>
 
 <footer>
   <span>TrendScanner IL © 2026</span>
-  <span>v6.0 — טיקטוק + אינסטגרם</span>
+  <span>v7.0 — טיקטוק + אינסטגרם</span>
 </footer>
-
 </div>
-<script>
-const API_KEY = 'T1SPIJ1MNZUq3Zl7zgp2b0wng1V2';
-const TT = 'https://api.scrapecreators.com/v1/tiktok';
-const IG = 'https://api.scrapecreators.com/v1/instagram';
-const MAX = 20;
-const SK = 'ts_il_v6_tags';
 
-const DEFAULTS = [
+<script>
+const API_KEY='T1SPIJ1MNZUq3Zl7zgp2b0wng1V2';
+const TT='https://api.scrapecreators.com/v1/tiktok';
+const IG='https://api.scrapecreators.com/v1/instagram';
+const MAX=20;
+const SK='ts_il_v7';
+
+const DEFAULTS=[
   {tag:'toysoftiktok',plat:'both'},{tag:'kidstoys',plat:'both'},
   {tag:'fidgettoys',plat:'both'},{tag:'blindbox',plat:'both'},
   {tag:'surprisetoys',plat:'both'},{tag:'collectibletoys',plat:'both'},
@@ -228,195 +380,192 @@ const DEFAULTS = [
   {tag:'miniverse',plat:'both'},{tag:'waterbead',plat:'both'},
 ];
 
-const IN_IL = ['labubu','pop it','popit','squishmallow','miniverse','smiggle','waterbead','water bead','lol surprise','mini brands'];
-const NOT_IL = ['cardcapture','card capture','joycat','kidsfinds','surprisetoys','collectibletoys','viraltoysoftiktok','toysunboxing'];
-const BABY_KW = ['baby','infant','toddler','newborn','montessori','sensory board','busy board','abc magnets','letter tracing'];
+const IN_IL=['labubu','pop it','popit','squishmallow','miniverse','smiggle','waterbead','water bead','lol surprise','mini brands'];
+const NOT_IL=['cardcapture','card capture','joycat','kidsfinds','surprisetoys','collectibletoys','viraltoysoftiktok','toysunboxing'];
+const BABY_KW=['baby','infant','toddler','newborn','montessori','sensory board','busy board','abc magnets','letter tracing'];
 
-let tags = [];
+let tags=[];
 
-function load() {
-  try { tags = JSON.parse(localStorage.getItem(SK)) || [...DEFAULTS]; }
-  catch { tags = [...DEFAULTS]; }
+function showTab(id,el){
+  ['scan','guide','tags'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===id?'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function load(){
+  try{tags=JSON.parse(localStorage.getItem(SK))||[...DEFAULTS];}
+  catch{tags=[...DEFAULTS];}
   render();
 }
 
-function save() {
-  try { localStorage.setItem(SK, JSON.stringify(tags)); } catch {}
-}
+function save(){try{localStorage.setItem(SK,JSON.stringify(tags));}catch{}}
 
-function render() {
-  document.getElementById('tag-count').textContent = tags.length;
-  document.getElementById('max-warn').style.display = tags.length >= MAX ? 'block' : 'none';
-  document.getElementById('tags-wrap').innerHTML = tags.map((t,i) => `
-    <div class="tag-chip ${t.plat==='both'?'dual':''}">
+function render(){
+  document.getElementById('tag-count').textContent=tags.length;
+  document.getElementById('max-warn').style.display=tags.length>=MAX?'block':'none';
+  document.getElementById('tags-wrap').innerHTML=tags.map((t,i)=>`
+    <div class="chip ${t.plat==='both'?'dual':''}">
       #${t.tag}
-      <span class="chip-platform">${t.plat==='both'?'TT+IG':'TT'}</span>
+      <span class="chip-plat">${t.plat==='both'?'TT+IG':'TT'}</span>
       <span class="chip-x" onclick="removeTag(${i})">×</span>
     </div>`).join('');
 }
 
-function addTag() {
-  const inp = document.getElementById('tag-input');
-  const plat = document.getElementById('plat-sel').value;
-  const tag = inp.value.trim().replace(/^#/,'').toLowerCase().replace(/\s+/g,'');
-  if (!tag) return;
-  if (tags.length >= MAX) { document.getElementById('max-warn').style.display='block'; return; }
-  if (tags.find(t=>t.tag===tag)) { alert('האשטג כבר קיים'); return; }
-  tags.push({tag, plat});
-  save(); render(); inp.value='';
+function addTag(){
+  const inp=document.getElementById('tag-input');
+  const plat=document.getElementById('plat-sel').value;
+  const tag=inp.value.trim().replace(/^#/,'').toLowerCase().replace(/\s+/g,'');
+  if(!tag)return;
+  if(tags.length>=MAX){document.getElementById('max-warn').style.display='block';return;}
+  if(tags.find(t=>t.tag===tag)){alert('האשטג כבר קיים');return;}
+  tags.push({tag,plat});
+  save();render();inp.value='';
 }
 
-function removeTag(i) { tags.splice(i,1); save(); render(); }
+function removeTag(i){tags.splice(i,1);save();render();}
 
-const fmt = n => !n?'0':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(0)+'K':n+'';
+const fmt=n=>!n?'0':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(0)+'K':n+'';
+const isBaby=desc=>BABY_KW.some(k=>(desc||'').toLowerCase().includes(k));
 
-function isBaby(desc) { return BABY_KW.some(k=>(desc||'').toLowerCase().includes(k)); }
-
-function extractName(desc, tag) {
-  if (!desc) return '#'+tag;
-  let c = desc.replace(/#\w+/g,'').replace(/[🎁🎮🧸✨🔥💫⭐🌟🫧💥]/g,'').trim();
-  if (c.length > 50) c = c.substring(0,50)+'...';
-  return c.length > 4 ? c : '#'+tag;
+function extractName(desc,tag){
+  if(!desc)return null;
+  let c=desc.replace(/#\w+/g,'').replace(/[🎁🎮🧸✨🔥💫⭐🌟🫧💥@]/g,'').trim();
+  if(c.length>55)c=c.substring(0,55)+'...';
+  return c.length>4?c:null;
 }
 
-function inIsrael(name, tag) {
-  const c = (name+' '+tag).toLowerCase();
-  if (IN_IL.some(k=>c.includes(k))) return true;
-  if (NOT_IL.some(k=>c.includes(k))) return false;
+function inIsrael(name,tag){
+  const c=((name||'')+' '+tag).toLowerCase();
+  if(IN_IL.some(k=>c.includes(k)))return true;
+  if(NOT_IL.some(k=>c.includes(k)))return false;
   return null;
 }
 
-function trendScore(vc, views, likes, shares, baby, igViews) {
-  let s = baby ? -15 : 0;
-  s += vc<50?20:vc<200?15:vc<1000?10:3;
-  const avg = vc>0?views/vc:0;
-  s += avg>1e6?25:avg>5e5?20:avg>1e5?15:avg>5e4?10:5;
-  const lr = views>0?likes/views:0;
-  s += lr>.08?20:lr>.05?15:lr>.03?10:5;
-  const sr = views>0?shares/views:0;
-  s += sr>.02?15:sr>.01?10:5;
-  if (igViews>0) s += 8;
-  s += 10;
+function calcTrend(vc,views,likes,shares,baby,igV){
+  let s=baby?-15:0;
+  s+=vc<50?20:vc<200?15:vc<1000?10:3;
+  const avg=vc>0?views/vc:0;
+  s+=avg>1e6?25:avg>5e5?20:avg>1e5?15:avg>5e4?10:5;
+  const lr=views>0?likes/views:0;
+  s+=lr>.08?20:lr>.05?15:lr>.03?10:5;
+  const sr=views>0?shares/views:0;
+  s+=sr>.02?15:sr>.01?10:5;
+  if(igV>0)s+=8;
+  s+=10;
   return Math.min(100,Math.max(0,s));
 }
 
-function israelScore(vc, avg, sr, baby, il, igViews) {
-  if (il===true) return {score:0, factors:['כבר בישראל']};
-  let s=0, f=[];
-  if (baby) { s+=5; f.push('מוצר לתינוקות'); }
-  else { s+=20; f.push('גיל 5-14 מתאים'); }
-  s += avg>5e5?25:avg>1e5?15:5;
-  if (avg>5e5) f.push('ויזואלי מאוד');
-  else if (avg>1e5) f.push('ויזואלי');
-  else f.push('פחות ויזואלי');
-  s += sr>.02?20:sr>.01?12:4;
-  if (sr>.02) f.push('אפקט עדר חזק');
-  else if (sr>.01) f.push('אפקט עדר בינוני');
-  else f.push('אפקט עדר חלש');
-  if (vc<100) { s+=15; f.push('מוקדם מאוד'); }
-  else if (vc<500) { s+=8; f.push('שלב עולה'); }
-  if (il===false) { s+=10; f.push('לא הגיע לישראל'); }
-  if (igViews>0) { s+=10; f.push('גם באינסטגרם'); }
-  return {score:Math.min(100,s), factors:f};
+function calcIsrael(vc,avg,sr,baby,il,igV){
+  if(il===true)return{score:0,factors:[{t:'כבר בישראל',c:'bad'}]};
+  let s=0,f=[];
+  if(baby){s+=5;f.push({t:'מוצר לתינוקות',c:'bad'});}
+  else{s+=20;f.push({t:'גיל 5-14 מתאים',c:'good'});}
+  s+=avg>5e5?25:avg>1e5?15:5;
+  if(avg>5e5)f.push({t:'ויזואלי מאוד',c:'good'});
+  else if(avg>1e5)f.push({t:'ויזואלי',c:'good'});
+  else f.push({t:'פחות ויזואלי',c:'bad'});
+  s+=sr>.02?20:sr>.01?12:4;
+  if(sr>.02)f.push({t:'אפקט עדר חזק',c:'good'});
+  else if(sr>.01)f.push({t:'אפקט עדר בינוני',c:'ok'});
+  else f.push({t:'אפקט עדר חלש',c:'bad'});
+  if(vc<100){s+=15;f.push({t:'מוקדם מאוד',c:'good'});}
+  else if(vc<500){s+=8;f.push({t:'שלב עולה',c:'ok'});}
+  else f.push({t:'שלב מתקדם',c:'bad'});
+  if(il===false){s+=10;f.push({t:'לא הגיע לישראל',c:'good'});}
+  else if(il===null)f.push({t:'סטטוס ישראל לא ידוע',c:'ok'});
+  if(igV>0){s+=10;f.push({t:'גם באינסטגרם',c:'good'});}
+  return{score:Math.min(100,s),factors:f};
 }
 
-// יצירת סיכום ברור לכל מוצר
-function makeSummary(item) {
-  if (item.il===true) {
-    return {cls:'stop', text:`⛔ כבר נמכר בישראל — מאוחר מדי. אל תזמין.`};
-  }
-  if (item.baby) {
-    return {cls:'baby', text:`👶 מוצר לתינוקות — לא מתאים לאסטרטגיה שלנו. שמור לידיעה כללית.`};
-  }
-  const ts = item.ts, is = item.is;
-  if (ts <= 35 && is >= 50) {
-    return {cls:'wait', text:`👀 עדיין בשלב מוקדם מאוד. עקוב שבוע נוסף לפני שמחליטים.`};
-  }
-  if (ts >= 36 && ts <= 60 && is >= 55 && item.il !== true) {
-    return {cls:'go', text:`✅ הזדמנות! המוצר עולה בארה"ב ועוד לא הגיע לישראל. שווה לחקור ולשקול הזמנה.`};
-  }
-  if (ts > 60 && ts <= 80 && item.il !== true) {
-    return {cls:'wait', text:`⚠️ המוצר מתפוצץ בארה"ב. אם לא הגיע לישראל — יש עוד חלון קצר. פעל מהר או ויתר.`};
-  }
-  if (ts > 80) {
-    return {cls:'stop', text:`🔴 המוצר בפיק. כנראה מאוחר מדי גם אם לא הגיע לישראל.`};
-  }
-  return {cls:'wait', text:`🔎 מידע לא מספיק — בדוק ידנית בטיקטוק.`};
+function makeSummary(ts,is,il,baby){
+  if(il===true)
+    return{cls:'bl-stop',title:'שורה תחתונה',text:'המוצר כבר נמכר בישראל.',action:'⛔ אל תזמין — מאוחר מדי.'};
+  if(baby)
+    return{cls:'bl-info',title:'שורה תחתונה',text:'מוצר לתינוקות — לא מייצר טרנד כיתתי.',action:'👶 שמור לידיעה, לא לפעולה.'};
+  if(ts<=35&&is>=50)
+    return{cls:'bl-wait',title:'שורה תחתונה',text:'המוצר בשלב מוקדם מאוד בארה"ב.',action:'👀 עקוב שבוע-שבועיים נוספים לפני שמחליטים.'};
+  if(ts<=35&&is<50)
+    return{cls:'bl-info',title:'שורה תחתונה',text:'מוצר מוקדם אבל עם סיכוי נמוך להגיע לישראל.',action:'📌 שמור ברשימת המעקב, אל תפעל עדיין.'};
+  if(ts>=36&&ts<=60&&is>=55&&il!==true)
+    return{cls:'bl-go',title:'שורה תחתונה',text:'המוצר עולה בארה"ב ועוד לא הגיע לישראל.',action:'✅ כדאי לחקור ולשקול הזמנה עכשיו!'};
+  if(ts>=36&&ts<=60&&is<55)
+    return{cls:'bl-wait',title:'שורה תחתונה',text:'המוצר עולה אבל הסיכוי לישראל בינוני.',action:'⚠️ בדוק ידנית לפני שמחליט.'};
+  if(ts>60&&ts<=80&&il!==true)
+    return{cls:'bl-wait',title:'שורה תחתונה',text:'המוצר מתפוצץ בארה"ב — חלון הזמן מתקצר.',action:'⏰ אם לא הגיע לישראל — פעל מהר מאוד או ויתר.'};
+  if(ts>80)
+    return{cls:'bl-stop',title:'שורה תחתונה',text:'המוצר בשיא הפיק.',action:'🔴 כנראה מאוחר מדי — גם אם לא הגיע לישראל.'};
+  return{cls:'bl-info',title:'שורה תחתונה',text:'מידע לא מספיק לקביעת עמדה.',action:'🔎 בדוק ידנית בטיקטוק.'};
 }
 
-function trendColor(s) {
-  return s<=35?'#3b82f6':s<=60?'#10b981':s<=80?'#f59e0b':'#ef4444';
-}
+function tc(s){return s<=35?'#3b82f6':s<=60?'#10b981':s<=80?'#f59e0b':'#ef4444';}
+function ic(s){return s>=60?'#10b981':s>=40?'#f59e0b':'#ef4444';}
 
-function ilColor(s) {
-  return s>=60?'#10b981':s>=40?'#f59e0b':'#ef4444';
-}
-
-async function fetchTT(tag) {
-  const r = await fetch(`${TT}/search/hashtag?hashtag=${encodeURIComponent(tag)}&region=US`,{headers:{'x-api-key':API_KEY}});
-  if (!r.ok) throw new Error('TT error');
+async function fetchTT(tag){
+  const r=await fetch(`${TT}/search/hashtag?hashtag=${encodeURIComponent(tag)}&region=US`,{headers:{'x-api-key':API_KEY}});
+  if(!r.ok)throw new Error('TT');
   return r.json();
 }
 
-async function fetchIG(tag) {
-  try {
-    const r = await fetch(`${IG}/hashtag/posts?hashtag=${encodeURIComponent(tag)}&limit=12`,{headers:{'x-api-key':API_KEY}});
-    if (!r.ok) return null;
+async function fetchIG(tag){
+  try{
+    const r=await fetch(`${IG}/hashtag/posts?hashtag=${encodeURIComponent(tag)}&limit=12`,{headers:{'x-api-key':API_KEY}});
+    if(!r.ok)return null;
     return r.json();
-  } catch { return null; }
+  }catch{return null;}
 }
 
-async function runScan() {
+async function runScan(){
   const btn=document.getElementById('scan-btn');
   const spin=document.getElementById('spin');
   const icon=document.getElementById('btn-icon');
   const txt=document.getElementById('btn-txt');
-  btn.disabled=true; spin.style.display='block'; icon.style.display='none'; txt.textContent='סורק...';
+  btn.disabled=true;spin.style.display='block';icon.style.display='none';txt.textContent='סורק...';
   document.getElementById('alert-area').innerHTML='';
   document.getElementById('results').innerHTML='<div class="empty">⚡ סורק...</div>';
 
   const items=[];
   let done=0;
 
-  for (const h of tags) {
+  for(const h of tags){
     document.getElementById('prog-area').innerHTML=`
       <div class="prog">
         <div class="prog-txt">סורק #${h.tag} — ${done+1}/${tags.length}</div>
         <div class="prog-track"><div class="prog-fill" style="width:${Math.round(done/tags.length*100)}%"></div></div>
       </div>`;
-    try {
-      const ttd = await fetchTT(h.tag);
-      const vids = ttd.aweme_list||[];
+    try{
+      const ttd=await fetchTT(h.tag);
+      const vids=ttd.aweme_list||[];
       let tv=0,tl=0,ts2=0;
       vids.forEach(v=>{const s=v.statistics||{};tv+=s.play_count||0;tl+=s.digg_count||0;ts2+=s.share_count||0;});
       const top=[...vids].sort((a,b)=>(b.statistics?.play_count||0)-(a.statistics?.play_count||0))[0];
       const desc=top?.desc||'';
-      const name=extractName(desc,h.tag);
+      const rawName=extractName(desc,h.tag);
       const baby=isBaby(desc);
       const avg=vids.length>0?tv/vids.length:0;
       const sr=tv>0?ts2/tv:0;
       let igV=0,igP=0;
-      if (h.plat==='both') {
+      if(h.plat==='both'){
         await new Promise(r=>setTimeout(r,400));
         const igd=await fetchIG(h.tag);
-        if (igd?.data){const p=igd.data;igP=p.length;p.forEach(x=>{igV+=x.view_count||x.video_view_count||0;});}
+        if(igd?.data){const p=igd.data;igP=p.length;p.forEach(x=>{igV+=x.view_count||x.video_view_count||0;});}
       }
-      const il=inIsrael(name,h.tag);
-      const ts_score=trendScore(vids.length,tv,tl,ts2,baby,igV);
-      const {score:is_score,factors}=israelScore(vids.length,avg,sr,baby,il,igV);
-      items.push({tag:h.tag,plat:h.plat,name,desc,baby,il,vc:vids.length,tv,tl,ts2,igV,igP,avg,sr,ts:ts_score,is:is_score,factors,topV:top?.statistics?.play_count||0});
-    } catch {}
+      const il=inIsrael(rawName,h.tag);
+      const ts_s=calcTrend(vids.length,tv,tl,ts2,baby,igV);
+      const{score:is_s,factors}=calcIsrael(vids.length,avg,sr,baby,il,igV);
+      items.push({tag:h.tag,plat:h.plat,rawName,desc,baby,il,vc:vids.length,tv,tl,ts2,igV,igP,avg,sr,ts:ts_s,is:is_s,factors,topV:top?.statistics?.play_count||0});
+    }catch{}
     done++;
     await new Promise(r=>setTimeout(r,600));
   }
 
   document.getElementById('prog-area').innerHTML='';
 
-  // מיון — הזדמנויות קודם
   items.sort((a,b)=>{
     const ao=a.is>=50&&a.ts<=65&&a.il!==true&&!a.baby;
     const bo=b.is>=50&&b.ts<=65&&b.il!==true&&!b.baby;
-    if(ao&&!bo)return -1; if(!ao&&bo)return 1;
+    if(ao&&!bo)return -1;if(!ao&&bo)return 1;
     return b.is-a.is;
   });
 
@@ -427,14 +576,16 @@ async function runScan() {
   document.getElementById('s-il').textContent=inIL;
   document.getElementById('s-time').textContent=new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
 
-  // כרטיסיות
   let html='<div class="grid">';
   items.forEach((item,i)=>{
-    const summary=makeSummary(item);
+    const sum=makeSummary(item.ts,item.is,item.il,item.baby);
     const isOpp=item.is>=50&&item.ts<=65&&item.il!==true&&!item.baby;
     const isLate=item.il===true||item.ts>80;
-    const tc=trendColor(item.ts);
-    const ic=ilColor(item.is);
+    const stripeColor=isOpp?'#10b981':isLate?'#ef4444':item.ts<=35?'#3b82f6':'#f59e0b';
+
+    // שם המוצר — ברור ובולט
+    const displayName = item.rawName || '#'+item.tag;
+    const isHashtagName = !item.rawName;
 
     const ilBadge=item.il===true
       ?`<span class="badge b-red">🇮🇱 כבר בישראל</span>`
@@ -446,52 +597,68 @@ async function runScan() {
       ?`<span class="badge b-gray">👶 תינוקות</span>`
       :`<span class="badge b-blue">גיל 5-14</span>`;
 
-    const phaseLbl=item.ts<=35?'גל ראשון':item.ts<=60?'הזמן להזמין':item.ts<=80?'מתפוצץ':'פיק';
-    const phaseCls=item.ts<=35?'b-blue':item.ts<=60?'b-green':item.ts<=80?'b-amber':'b-red';
-
     const igRow=item.plat==='both'?`
-      <div class="platforms">
-        <div class="plat"><span class="plat-icon">🎵</span><span class="plat-val">${fmt(item.tv)}</span><span class="plat-lbl"> TikTok</span></div>
-        <div class="plat"><span class="plat-icon">📸</span><span class="plat-val">${item.igP>0?fmt(item.igV):'לא נמצא'}</span><span class="plat-lbl"> Instagram</span></div>
-      </div>`:
-      `<div class="platforms"><div class="plat"><span class="plat-icon">🎵</span><span class="plat-val">${fmt(item.tv)}</span><span class="plat-lbl"> TikTok בלבד</span></div></div>`;
+      <div class="plats">
+        <div class="plat"><span>🎵</span><span class="plat-val">${fmt(item.tv)}</span><span class="plat-lbl"> TikTok</span></div>
+        <div class="plat"><span>📸</span><span class="plat-val">${item.igP>0?fmt(item.igV):'לא נמצא'}</span><span class="plat-lbl"> Instagram</span></div>
+      </div>`
+      :`<div class="plats"><div class="plat"><span>🎵</span><span class="plat-val">${fmt(item.tv)}</span><span class="plat-lbl"> TikTok בלבד</span></div></div>`;
+
+    const factorsHtml=item.factors.map(f=>
+      `<span class="crit-tag ${f.c==='good'?'ct-good':f.c==='bad'?'ct-bad':'ct-ok'}">${f.t}</span>`
+    ).join('');
 
     html+=`
     <div class="card ${isOpp?'opp':isLate?'late':''}" style="animation-delay:${i*.07}s">
-      <div class="card-top">
-        <div class="card-name">${item.name}</div>
-        <div class="tag-row">
-          <span class="badge ${phaseCls}">${phaseLbl}</span>
-          ${ilBadge}
+      <div class="card-stripe" style="background:${stripeColor}"></div>
+      <div class="card-body">
+
+        <!-- שם המוצר -->
+        <div class="product-name">${displayName}</div>
+        <div class="product-source">
+          האשטג: #${item.tag}
+          ${isHashtagName?'<span style="color:var(--amber)"> — שם לא זוהה, בדוק ידנית</span>':''}
         </div>
-      </div>
-      <div class="card-tag">#${item.tag} · ${ageBadge}</div>
 
-      <div class="summary ${summary.cls}">${summary.text}</div>
-
-      ${igRow}
-
-      <div class="metrics">
-        <div class="m"><div class="m-val">${item.vc}</div><div class="m-lbl">סרטוני TT</div></div>
-        <div class="m"><div class="m-val">${fmt(item.topV)}</div><div class="m-lbl">פיק סרטון</div></div>
-        <div class="m"><div class="m-val">${item.igP>0?item.igP:'—'}</div><div class="m-lbl">פוסטי IG</div></div>
-      </div>
-
-      <div class="scores">
-        <div class="score-row">
-          <div class="score-lbl">ניקוד טרנד</div>
-          <div class="score-track"><div class="score-fill" style="width:${item.ts}%;background:${tc}"></div></div>
-          <div class="score-n" style="color:${tc}">${item.ts}</div>
+        <!-- תגיות -->
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+          ${ageBadge}${ilBadge}
         </div>
-        <div class="score-row">
-          <div class="score-lbl">סבירות ישראל</div>
-          <div class="score-track"><div class="score-fill" style="width:${item.is}%;background:${ic}"></div></div>
-          <div class="score-n" style="color:${ic}">${item.is}%</div>
-        </div>
-      </div>
 
-      <div class="tag-row">
-        ${item.factors.map(f=>`<span class="badge b-gray">${f}</span>`).join('')}
+        <!-- שורה תחתונה -->
+        <div class="bottom-line ${sum.cls}">
+          <div class="bl-title">${sum.title}</div>
+          <div class="bl-text">${sum.text}</div>
+          <div class="bl-action">${sum.action}</div>
+        </div>
+
+        <!-- פלטפורמות -->
+        ${igRow}
+
+        <!-- מספרים -->
+        <div class="mini-metrics">
+          <div class="mm"><div class="mm-val">${item.vc}</div><div class="mm-lbl">סרטוני TT</div></div>
+          <div class="mm"><div class="mm-val">${fmt(item.topV)}</div><div class="mm-lbl">פיק סרטון</div></div>
+          <div class="mm"><div class="mm-val">${item.igP>0?item.igP:'—'}</div><div class="mm-lbl">פוסטי IG</div></div>
+        </div>
+
+        <!-- ניקוד עם סרגל -->
+        <div class="score-section">
+          <div class="score-row">
+            <div class="score-lbl">ניקוד טרנד</div>
+            <div class="score-track"><div class="score-fill" style="width:${item.ts}%;background:${tc(item.ts)}"></div></div>
+            <div class="score-n" style="color:${tc(item.ts)}">${item.ts}</div>
+          </div>
+          <div class="score-row">
+            <div class="score-lbl">סבירות ישראל</div>
+            <div class="score-track"><div class="score-fill" style="width:${item.is}%;background:${ic(item.is)}"></div></div>
+            <div class="score-n" style="color:${ic(item.is)}">${item.is}%</div>
+          </div>
+        </div>
+
+        <!-- קריטריונים שזוהו -->
+        <div class="crits">${factorsHtml}</div>
+
       </div>
     </div>`;
   });
@@ -501,10 +668,10 @@ async function runScan() {
   const best=items.filter(p=>p.is>=55&&p.ts<=60&&p.il!==true&&!p.baby);
   if(best.length>0){
     document.getElementById('alert-area').innerHTML=`
-      <div class="alert">🎯 <b>הזדמנויות השבוע:</b> ${best.map(b=>b.name).slice(0,3).join(' · ')} — לא הגיעו לישראל, כדאי לחקור עכשיו</div>`;
+      <div class="alert">🎯 <b>הזדמנויות השבוע:</b> ${best.map(b=>b.rawName||'#'+b.tag).slice(0,3).join(' · ')} — לא הגיעו לישראל, כדאי לחקור עכשיו</div>`;
   }
 
-  btn.disabled=false; spin.style.display='none'; icon.style.display='inline'; txt.textContent='סרוק שוב';
+  btn.disabled=false;spin.style.display='none';icon.style.display='inline';txt.textContent='סרוק שוב';
 }
 
 load();
