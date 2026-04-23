@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrendScanner IL</title>
+<title>TrendScanner IL v8</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -175,6 +175,15 @@ header{padding:22px 0 16px;border-bottom:1px solid var(--border);margin-bottom:2
 .b-gray{background:rgba(100,116,139,.12);color:var(--muted);}
 
 .empty{padding:50px;text-align:center;color:var(--muted);font-size:13px;font-family:var(--mono);}
+
+/* מגמה שבועית */
+.trend-up{color:#10b981;font-weight:700;}
+.trend-down{color:#ef4444;font-weight:700;}
+.trend-flat{color:var(--muted);}
+.week-trend{font-size:11px;font-family:var(--mono);margin-top:3px;}
+.buy-signal{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:6px;padding:4px 10px;font-size:11px;color:#6ee7b7;margin-top:6px;display:inline-block;}
+.country-row{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;}
+.country-badge{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(59,130,246,.1);color:#93c5fd;}
 footer{border-top:1px solid var(--border);padding:14px 0;margin-top:20px;display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:var(--mono);}
 </style>
 </head>
@@ -186,7 +195,7 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:20px;display
     <div class="logo-box">📡</div>
     <div class="logo-name">Trend<em>Scanner</em> IL</div>
   </div>
-  <div class="live"><div class="dot"></div> פעיל — טיקטוק + אינסטגרם</div>
+  <div class="live"><div class="dot"></div> פעיל — קלוד + טיקטוק + אינסטגרם</div>
 </header>
 
 <!-- טאבים -->
@@ -360,7 +369,7 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:20px;display
 
 <footer>
   <span>TrendScanner IL © 2026</span>
-  <span>v7.0 — טיקטוק + אינסטגרם</span>
+  <span>v10.0 — מגמות + מדינות + תגובות</span>
 </footer>
 </div>
 
@@ -429,11 +438,146 @@ function removeTag(i){tags.splice(i,1);save();render();}
 const fmt=n=>!n?'0':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(0)+'K':n+'';
 const isBaby=desc=>BABY_KW.some(k=>(desc||'').toLowerCase().includes(k));
 
+// === זיכרון שבועי ===
+const HISTORY_KEY='ts_il_history';
+const MAX_WEEKS=8;
+
+function loadHistory(){
+  try{return JSON.parse(localStorage.getItem(HISTORY_KEY))||{};}
+  catch{return {};}
+}
+
+function saveToHistory(items){
+  const history=loadHistory();
+  const week=getWeekKey();
+  history[week]={};
+  items.forEach(item=>{
+    history[week][item.tag]={ts:item.ts,is:item.is,name:item.rawName};
+  });
+  const weeks=Object.keys(history).sort();
+  if(weeks.length>MAX_WEEKS)weeks.slice(0,weeks.length-MAX_WEEKS).forEach(w=>delete history[w]);
+  try{localStorage.setItem(HISTORY_KEY,JSON.stringify(history));}catch{}
+}
+
+function getWeekKey(){
+  const d=new Date();
+  const year=d.getFullYear();
+  const week=Math.ceil(((d-new Date(year,0,1))/86400000+1)/7);
+  return `${year}-W${week}`;
+}
+
+function getPrevData(tag){
+  const history=loadHistory();
+  const weeks=Object.keys(history).sort();
+  for(let i=weeks.length-2;i>=0;i--){
+    const data=history[weeks[i]]?.[tag];
+    if(data)return data;
+  }
+  return null;
+}
+
+function getTrend(current,prev){
+  if(!prev||prev===0)return null;
+  const diff=current-prev;
+  const pct=Math.round((diff/prev)*100);
+  if(diff>5)return{dir:'↑',val:`+${pct}%`,cls:'trend-up'};
+  if(diff<-5)return{dir:'↓',val:`${pct}%`,cls:'trend-down'};
+  return{dir:'=',val:'0%',cls:'trend-flat'};
+}
+
+// === ניתוח תגובות ===
+async function analyzeComments(videoId){
+  try{
+    const url=`${TT}/comments?videoId=${videoId}&limit=30`;
+    const r=await fetch(url,{headers:{'x-api-key':API_KEY}});
+    if(!r.ok)return null;
+    const data=await r.json();
+    const comments=data.comments||data.data||[];
+    if(comments.length===0)return null;
+
+    const kwBuy=['where to buy','how to buy','where can i get','where do i get','buy this','get this','link?','shop','order','how much','price'];
+    const kwShare=['sending this','tagging','showing this to','my mom needs','my kid needs','need to show','sharing this'];
+    const kwObsess=['obsessed','i need this','want this','i want','need this','so satisfying','amazing','incredible','love this'];
+    const kwRecognize=["i've seen this","seen this everywhere","my kid has","everyone has","my daughter has","my son has"];
+
+    let buy=0,share=0,obsess=0,recognize=0;
+    comments.forEach(c=>{
+      const t=(c.text||c.comment||'').toLowerCase();
+      if(kwBuy.some(k=>t.includes(k)))buy++;
+      if(kwShare.some(k=>t.includes(k)))share++;
+      if(kwObsess.some(k=>t.includes(k)))obsess++;
+      if(kwRecognize.some(k=>t.includes(k)))recognize++;
+    });
+
+    return{buy,share,obsess,recognize,total:comments.length};
+  }catch{return null;}
+}
+
+// === בדיקת מדינות ===
+async function checkCountries(tag){
+  let found=0;
+  for(const country of['GB','AU']){
+    try{
+      await new Promise(r=>setTimeout(r,300));
+      const url=`${TT}/search/hashtag?hashtag=${encodeURIComponent(tag)}&region=${country}`;
+      const r=await fetch(url,{headers:{'x-api-key':API_KEY}});
+      if(!r.ok)continue;
+      const data=await r.json();
+      if((data.aweme_list||[]).length>0)found++;
+    }catch{}
+  }
+  return found;
+}
+
 function extractName(desc,tag){
   if(!desc)return null;
   let c=desc.replace(/#\w+/g,'').replace(/[🎁🎮🧸✨🔥💫⭐🌟🫧💥@]/g,'').trim();
   if(c.length>55)c=c.substring(0,55)+'...';
   return c.length>4?c:null;
+}
+
+// ניתוח מוצר דרך קלוד — שם + בדיקת טרנד
+async function analyzeProductAI(descriptions, hashtag) {
+  try {
+    const prompt = `אתה מומחה לטרנדים של צעצועים ומוצרי ילדים.
+
+להלן כותרות של סרטוני טיקטוק מהאשטג #${hashtag}:
+${descriptions.slice(0,6).map((d,i)=>`${i+1}. ${d}`).join('\n')}
+
+ענה על 4 שאלות:
+
+1. שם המוצר — מה שם המוצר הספציפי? שם קצר בעברית או אנגלית. אם לא מוצר ספציפי — null.
+
+2. ותיק או חדש — האם זה מוצר ותיק וידוע (כמו ערכת רופא, לגו, ברבי) שקיים שנים, או מוצר חדש וייחודי?
+   ענה: "ותיק" / "חדש" / "לא ידוע"
+
+3. פוטנציאל טרנד — האם המוצר מתאים לטרנד ויראלי? כלומר — האם הוא זול, ויזואלי, כיפי לסרטון, ומייצר אפקט עדר בין ילדים?
+   ענה: "גבוה" / "בינוני" / "נמוך"
+
+4. מוכר בעולם — האם אתה מכיר מוצר זה כטרנד בארה"ב, אירופה, או אסיה?
+   ענה: "כן" / "לא" / "לא ידוע"
+
+החזר JSON בלבד ללא טקסט נוסף:
+{"name": "שם המוצר או null", "age": "ותיק/חדש/לא ידוע", "potential": "גבוה/בינוני/נמוך", "known": "כן/לא/לא ידוע"}`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 150,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    const text = data.content[0]?.text || '';
+    const clean = text.replace(/```json|```/g,'').trim();
+    return JSON.parse(clean);
+  } catch {
+    return null;
+  }
 }
 
 function inIsrael(name,tag){
@@ -443,8 +587,10 @@ function inIsrael(name,tag){
   return null;
 }
 
-function calcTrend(vc,views,likes,shares,baby,igV){
+function calcTrend(vc,views,likes,shares,baby,igV,isOldProduct,isLowPotential,comments){
   let s=baby?-15:0;
+  if(isOldProduct) s-=20;
+  if(isLowPotential) s-=15;
   s+=vc<50?20:vc<200?15:vc<1000?10:3;
   const avg=vc>0?views/vc:0;
   s+=avg>1e6?25:avg>5e5?20:avg>1e5?15:avg>5e4?10:5;
@@ -453,30 +599,59 @@ function calcTrend(vc,views,likes,shares,baby,igV){
   const sr=views>0?shares/views:0;
   s+=sr>.02?15:sr>.01?10:5;
   if(igV>0)s+=8;
+
+  // תגובות — אינדיקטור ביקוש
+  if(comments){
+    if(comments.buy>=3)s+=15;
+    else if(comments.buy>=1)s+=7;
+    if(comments.share>=2)s+=8;
+    if(comments.obsess>=3)s+=5;
+    if(comments.recognize>=2)s+=5;
+  }
+
   s+=10;
   return Math.min(100,Math.max(0,s));
 }
 
-function calcIsrael(vc,avg,sr,baby,il,igV){
+function calcIsrael(vc,avg,sr,baby,il,igV,aiAge,aiPotential,aiKnown,countries){
   if(il===true)return{score:0,factors:[{t:'כבר בישראל',c:'bad'}]};
   let s=0,f=[];
   if(baby){s+=5;f.push({t:'מוצר לתינוקות',c:'bad'});}
   else{s+=20;f.push({t:'גיל 5-14 מתאים',c:'good'});}
+
+  if(aiAge==='ותיק'){s-=20;f.push({t:'מוצר ותיק',c:'bad'});}
+  else if(aiAge==='חדש'){s+=15;f.push({t:'מוצר חדש',c:'good'});}
+
+  if(aiPotential==='גבוה'){s+=20;f.push({t:'פוטנציאל גבוה',c:'good'});}
+  else if(aiPotential==='בינוני'){s+=10;f.push({t:'פוטנציאל בינוני',c:'ok'});}
+  else if(aiPotential==='נמוך'){s-=10;f.push({t:'פוטנציאל נמוך',c:'bad'});}
+
+  if(aiKnown==='כן'){s+=10;f.push({t:'מוכר כטרנד בעולם',c:'good'});}
+
   s+=avg>5e5?25:avg>1e5?15:5;
   if(avg>5e5)f.push({t:'ויזואלי מאוד',c:'good'});
   else if(avg>1e5)f.push({t:'ויזואלי',c:'good'});
   else f.push({t:'פחות ויזואלי',c:'bad'});
+
   s+=sr>.02?20:sr>.01?12:4;
   if(sr>.02)f.push({t:'אפקט עדר חזק',c:'good'});
   else if(sr>.01)f.push({t:'אפקט עדר בינוני',c:'ok'});
   else f.push({t:'אפקט עדר חלש',c:'bad'});
+
   if(vc<100){s+=15;f.push({t:'מוקדם מאוד',c:'good'});}
   else if(vc<500){s+=8;f.push({t:'שלב עולה',c:'ok'});}
   else f.push({t:'שלב מתקדם',c:'bad'});
+
   if(il===false){s+=10;f.push({t:'לא הגיע לישראל',c:'good'});}
   else if(il===null)f.push({t:'סטטוס ישראל לא ידוע',c:'ok'});
-  if(igV>0){s+=10;f.push({t:'גם באינסטגרם',c:'good'});}
-  return{score:Math.min(100,s),factors:f};
+
+  if(igV>0){s+=8;f.push({t:'גם באינסטגרם',c:'good'});}
+
+  if(countries>=2){s+=15;f.push({t:'עולה ב-3 מדינות',c:'good'});}
+  else if(countries===1){s+=8;f.push({t:'עולה בשתי מדינות',c:'ok'});}
+  else f.push({t:'רק בארה"ב עדיין',c:'ok'});
+
+  return{score:Math.min(100,Math.max(0,s)),factors:f};
 }
 
 function makeSummary(ts,is,il,baby){
@@ -541,7 +716,20 @@ async function runScan(){
       vids.forEach(v=>{const s=v.statistics||{};tv+=s.play_count||0;tl+=s.digg_count||0;ts2+=s.share_count||0;});
       const top=[...vids].sort((a,b)=>(b.statistics?.play_count||0)-(a.statistics?.play_count||0))[0];
       const desc=top?.desc||'';
-      const rawName=extractName(desc,h.tag);
+
+      // קלוד מנתח את המוצר
+      document.getElementById('prog-area').querySelector('.prog-txt').textContent=`קלוד מנתח #${h.tag}...`;
+      const allDescs = vids.map(v=>v.desc||'').filter(Boolean);
+      const aiResult = await analyzeProductAI(allDescs, h.tag);
+      const rawName = aiResult?.name || extractName(desc, h.tag);
+      const aiAge = aiResult?.age || 'לא ידוע';
+      const aiPotential = aiResult?.potential || 'לא ידוע';
+      const aiKnown = aiResult?.known || 'לא ידוע';
+
+      // אם המוצר ותיק — מוריד ניקוד
+      const isOldProduct = aiAge === 'ותיק';
+      // אם פוטנציאל נמוך — מוריד ניקוד
+      const isLowPotential = aiPotential === 'נמוך';
       const baby=isBaby(desc);
       const avg=vids.length>0?tv/vids.length:0;
       const sr=tv>0?ts2/tv:0;
@@ -551,16 +739,51 @@ async function runScan(){
         const igd=await fetchIG(h.tag);
         if(igd?.data){const p=igd.data;igP=p.length;p.forEach(x=>{igV+=x.view_count||x.video_view_count||0;});}
       }
-      const il=inIsrael(rawName,h.tag);
-      const ts_s=calcTrend(vids.length,tv,tl,ts2,baby,igV);
-      const{score:is_s,factors}=calcIsrael(vids.length,avg,sr,baby,il,igV);
-      items.push({tag:h.tag,plat:h.plat,rawName,desc,baby,il,vc:vids.length,tv,tl,ts2,igV,igP,avg,sr,ts:ts_s,is:is_s,factors,topV:top?.statistics?.play_count||0});
+      // בדיקת תגובות
+      document.getElementById('prog-area').querySelector('.prog-txt').textContent=`בודק תגובות #${h.tag}...`;
+      const topVideoId=top?.aweme_id||top?.id||'';
+      const comments=topVideoId?await analyzeComments(topVideoId):null;
+      await new Promise(r=>setTimeout(r,300));
+
+      // בדיקת מדינות
+      document.getElementById('prog-area').querySelector('.prog-txt').textContent=`בודק מדינות #${h.tag}...`;
+      const countries=await checkCountries(h.tag);
+      await new Promise(r=>setTimeout(r,300));
+
+      // סינון פרסומות
+      const cleanVids=vids.filter(v=>!v.is_ads&&!v.is_ad);
+      const cleanTv=cleanVids.reduce((s,v)=>s+(v.statistics?.play_count||0),0);
+      const cleanLikes=cleanVids.reduce((s,v)=>s+(v.statistics?.digg_count||0),0);
+      const cleanShares=cleanVids.reduce((s,v)=>s+(v.statistics?.share_count||0),0);
+
+      const ts_s=calcTrend(cleanVids.length,cleanTv,cleanLikes,cleanShares,baby,igV,isOldProduct,isLowPotential,comments);
+      const avgClean=cleanVids.length>0?cleanTv/cleanVids.length:0;
+      const srClean=cleanTv>0?cleanShares/cleanTv:0;
+      const{score:is_s,factors}=calcIsrael(cleanVids.length,avgClean,srClean,baby,il,igV,aiAge,aiPotential,aiKnown,countries);
+
+      const prevData=getPrevData(h.tag);
+      const trendDiff=getTrend(ts_s,prevData?.ts);
+      const israelDiff=getTrend(is_s,prevData?.is);
+
+      items.push({
+        tag:h.tag,plat:h.plat,rawName,desc,baby,il,
+        vc:cleanVids.length,tv:cleanTv,igV,igP,
+        avg:avgClean,sr:srClean,
+        ts:ts_s,is:is_s,factors,
+        topV:top?.statistics?.play_count||0,
+        aiAge,aiPotential,aiKnown,
+        comments,countries,
+        trendDiff,israelDiff
+      });
     }catch{}
     done++;
     await new Promise(r=>setTimeout(r,600));
   }
 
   document.getElementById('prog-area').innerHTML='';
+
+  // שמור לזיכרון השבועי
+  saveToHistory(items);
 
   items.sort((a,b)=>{
     const ao=a.is>=50&&a.ts<=65&&a.il!==true&&!a.baby;
@@ -623,6 +846,8 @@ async function runScan(){
         <!-- תגיות -->
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
           ${ageBadge}${ilBadge}
+          ${item.aiAge==='ותיק'?'<span class="badge b-amber">⏳ מוצר ותיק</span>':item.aiAge==='חדש'?'<span class="badge b-green">✨ מוצר חדש</span>':''}
+          ${item.aiPotential==='גבוה'?'<span class="badge b-green">🔥 פוטנציאל גבוה</span>':item.aiPotential==='נמוך'?'<span class="badge b-gray">📉 פוטנציאל נמוך</span>':''}
         </div>
 
         <!-- שורה תחתונה -->
@@ -642,18 +867,36 @@ async function runScan(){
           <div class="mm"><div class="mm-val">${item.igP>0?item.igP:'—'}</div><div class="mm-lbl">פוסטי IG</div></div>
         </div>
 
-        <!-- ניקוד עם סרגל -->
+        <!-- ניקוד עם סרגל + מגמה -->
         <div class="score-section">
           <div class="score-row">
             <div class="score-lbl">ניקוד טרנד</div>
             <div class="score-track"><div class="score-fill" style="width:${item.ts}%;background:${tc(item.ts)}"></div></div>
             <div class="score-n" style="color:${tc(item.ts)}">${item.ts}</div>
+            ${item.trendDiff?`<span class="${item.trendDiff.cls}" style="font-size:11px;margin-right:4px">${item.trendDiff.dir}${item.trendDiff.val}</span>`:'<span style="font-size:10px;color:var(--muted)">שבוע ראשון</span>'}
           </div>
           <div class="score-row">
             <div class="score-lbl">סבירות ישראל</div>
             <div class="score-track"><div class="score-fill" style="width:${item.is}%;background:${ic(item.is)}"></div></div>
             <div class="score-n" style="color:${ic(item.is)}">${item.is}%</div>
+            ${item.israelDiff?`<span class="${item.israelDiff.cls}" style="font-size:11px;margin-right:4px">${item.israelDiff.dir}${item.israelDiff.val}</span>`:''}
           </div>
+        </div>
+
+        <!-- תגובות -->
+        ${item.comments&&(item.comments.buy+item.comments.share+item.comments.obsess+item.comments.recognize)>0?`
+        <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">
+          ${item.comments.buy>0?`<span class="buy-signal">🛒 ${item.comments.buy} שאלות קנייה</span>`:''}
+          ${item.comments.share>0?`<span class="buy-signal" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2);color:#93c5fd;">📤 ${item.comments.share} שיתופים</span>`:''}
+          ${item.comments.obsess>0?`<span class="buy-signal" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2);color:#fcd34d;">🔥 ${item.comments.obsess} "אני חייב את זה"</span>`:''}
+          ${item.comments.recognize>0?`<span class="buy-signal" style="background:rgba(124,58,237,.1);border-color:rgba(124,58,237,.2);color:#c4b5fd;">👁 ${item.comments.recognize} "ראיתי את זה בכל מקום"</span>`:''}
+        </div>`:''}
+
+        <!-- נוכחות מדינות -->
+        <div class="country-row">
+          <span class="country-badge">🇺🇸 ארה"ב ✓</span>
+          ${item.countries>=1?'<span class="country-badge">🇬🇧 אנגליה ✓</span>':'<span class="country-badge" style="opacity:.4">🇬🇧 אנגליה —</span>'}
+          ${item.countries>=2?'<span class="country-badge">🇦🇺 אוסטרליה ✓</span>':'<span class="country-badge" style="opacity:.4">🇦🇺 אוסטרליה —</span>'}
         </div>
 
         <!-- קריטריונים שזוהו -->
