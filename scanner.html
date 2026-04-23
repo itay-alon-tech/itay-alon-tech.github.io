@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrendScanner IL v8</title>
+<title>TrendScanner IL v10</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -759,6 +759,7 @@ async function runScan(){
       const ts_s=calcTrend(cleanVids.length,cleanTv,cleanLikes,cleanShares,baby,igV,isOldProduct,isLowPotential,comments);
       const avgClean=cleanVids.length>0?cleanTv/cleanVids.length:0;
       const srClean=cleanTv>0?cleanShares/cleanTv:0;
+      const il=inIsrael(rawName,h.tag);
       const{score:is_s,factors}=calcIsrael(cleanVids.length,avgClean,srClean,baby,il,igV,aiAge,aiPotential,aiKnown,countries);
 
       const prevData=getPrevData(h.tag);
