@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrendScanner IL v10</title>
+<title>TrendScanner IL v11</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -202,7 +202,8 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:20px;display
 <div class="tabs">
   <div class="tab active" onclick="showTab('scan',this)">📊 סריקה</div>
   <div class="tab" onclick="showTab('guide',this)">📖 מדריך קריטריונים</div>
-  <div class="tab" onclick="showTab('tags',this)">⚙️ ניהול האשטגים</div>
+  <div class="tab" onclick="showTab('tags',this)">⚙️ האשטגים</div>
+  <div class="tab" onclick="showTab('keywords',this)">🔍 מילות חיפוש</div>
 </div>
 
 <!-- טאב סריקה -->
@@ -367,9 +368,27 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:20px;display
   </div>
 </div>
 
+<!-- טאב מילות חיפוש -->
+<div id="tab-keywords" style="display:none">
+  <div class="manager">
+    <div class="manager-top">
+      <div class="manager-lbl">🔍 מילות חיפוש בטיקטוק</div>
+      <div class="manager-cnt"><b id="kw-count">0</b> / 10 מילות חיפוש</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;">
+      הכלי מחפש את הביטויים האלה ישירות בטיקטוק — ומוצא מוצרים חדשים שעוד אין להם האשטג משלם. זה מוקדם יותר מסריקת האשטגים.
+    </div>
+    <div class="tags-wrap" id="kw-wrap"></div>
+    <div class="add-row">
+      <input class="add-in" id="kw-input" placeholder='למשל: "new toy 2025" או "kids obsessed toy"...' onkeydown="if(event.key==='Enter')addKeyword()" />
+      <button class="add-btn" onclick="addKeyword()">+ הוסף</button>
+    </div>
+  </div>
+</div>
+
 <footer>
   <span>TrendScanner IL © 2026</span>
-  <span>v10.0 — מגמות + מדינות + תגובות</span>
+  <span>v11.0 — מילות חיפוש + Google Trends</span>
 </footer>
 </div>
 
@@ -379,6 +398,50 @@ const TT='https://api.scrapecreators.com/v1/tiktok';
 const IG='https://api.scrapecreators.com/v1/instagram';
 const MAX=20;
 const SK='ts_il_v7';
+const KW_SK='ts_il_keywords';
+
+const DEFAULT_KEYWORDS = [
+  'new toy 2025',
+  'toy went viral',
+  'kids obsessed toy',
+  'toy haul kids',
+  'satisfying toy',
+  'must have toy',
+];
+
+const MAX_KW = 10;
+let keywords = [];
+
+function loadKeywords() {
+  try { keywords = JSON.parse(localStorage.getItem(KW_SK)) || [...DEFAULT_KEYWORDS]; }
+  catch { keywords = [...DEFAULT_KEYWORDS]; }
+  renderKeywords();
+}
+
+function saveKeywords() {
+  try { localStorage.setItem(KW_SK, JSON.stringify(keywords)); } catch {}
+}
+
+function renderKeywords() {
+  document.getElementById('kw-count').textContent = keywords.length;
+  document.getElementById('kw-wrap').innerHTML = keywords.map((k,i) => `
+    <div class="chip">
+      "${k}"
+      <span class="chip-x" onclick="removeKeyword(${i})">×</span>
+    </div>`).join('');
+}
+
+function addKeyword() {
+  const inp = document.getElementById('kw-input');
+  const kw = inp.value.trim().replace(/^"|"$/g,'');
+  if (!kw) return;
+  if (keywords.length >= MAX_KW) return;
+  if (keywords.includes(kw)) { alert('מילת החיפוש כבר קיימת'); return; }
+  keywords.push(kw);
+  saveKeywords(); renderKeywords(); inp.value = '';
+}
+
+function removeKeyword(i) { keywords.splice(i,1); saveKeywords(); renderKeywords(); }
 
 const DEFAULTS=[
   {tag:'toysoftiktok',plat:'both'},{tag:'kidstoys',plat:'both'},
@@ -396,7 +459,7 @@ const BABY_KW=['baby','infant','toddler','newborn','montessori','sensory board',
 let tags=[];
 
 function showTab(id,el){
-  ['scan','guide','tags'].forEach(t=>{
+  ['scan','guide','tags','keywords'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===id?'block':'none';
   });
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -483,6 +546,64 @@ function getTrend(current,prev){
   if(diff>5)return{dir:'↑',val:`+${pct}%`,cls:'trend-up'};
   if(diff<-5)return{dir:'↓',val:`${pct}%`,cls:'trend-down'};
   return{dir:'=',val:'0%',cls:'trend-flat'};
+}
+
+// === חיפוש לפי מילות מפתח ===
+async function searchByKeyword(keyword) {
+  try {
+    const url = `${TT}/search?keyword=${encodeURIComponent(keyword)}&region=US&count=20`;
+    const r = await fetch(url, { headers: { 'x-api-key': API_KEY } });
+    if (!r.ok) return [];
+    const data = await r.json();
+    return data.aweme_list || data.data || [];
+  } catch { return []; }
+}
+
+// === Google Trends ===
+async function checkGoogleTrends(productName) {
+  try {
+    const url = `https://trends.google.com/trends/api/dailytrends?hl=en-US&tz=-180&geo=US&ns=15`;
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const text = await r.text();
+    const json = JSON.parse(text.replace(")]}',\n",''));
+    const trends = json.default?.trendingSearchesDays?.[0]?.trendingSearches || [];
+    return trends.some(t =>
+      (t.title?.query||'').toLowerCase().includes(productName.toLowerCase())
+    );
+  } catch { return null; }
+}
+
+// === חילוץ מוצרים ממילות חיפוש ===
+async function extractProductsFromKeyword(videos, keyword) {
+  if (!videos.length) return [];
+  try {
+    const descs = videos.slice(0,8).map((v,i) => `${i+1}. ${v.desc||''}`).join('\n');
+    const prompt = `אתה מומחה לזיהוי טרנדים בצעצועים לילדים.
+
+חיפשתי בטיקטוק: "${keyword}"
+סרטונים שנמצאו:
+${descs}
+
+זהה עד 3 מוצרים ספציפיים חדשים בסרטונים.
+החזר JSON בלבד:
+{"products": [{"name": "שם המוצר", "age": "חדש/ותיק/לא ידוע", "relevant": true/false}]}`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!response.ok) return [];
+    const data = await response.json();
+    const text = data.content[0]?.text || '';
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    return parsed.products || [];
+  } catch { return []; }
 }
 
 // === ניתוח תגובות ===
@@ -783,25 +904,82 @@ async function runScan(){
 
   document.getElementById('prog-area').innerHTML='';
 
-  // שמור לזיכרון השבועי
-  saveToHistory(items);
+  // === סריקת מילות חיפוש ===
+  const kwProducts = []; // מוצרים חדשים שנמצאו דרך מילות חיפוש
+  for (const kw of keywords) {
+    document.getElementById('prog-area').innerHTML = `
+      <div class="prog">
+        <div class="prog-txt">🔍 מחפש "${kw}" בטיקטוק...</div>
+        <div class="prog-track"><div class="prog-fill" style="width:60%"></div></div>
+      </div>`;
+    const kwVids = await searchByKeyword(kw);
+    if (kwVids.length > 0) {
+      document.getElementById('prog-area').querySelector('.prog-txt').textContent = `קלוד מזהה מוצרים מ-"${kw}"...`;
+      const products = await extractProductsFromKeyword(kwVids, kw);
+      products.filter(p => p.relevant && p.age !== 'ותיק').forEach(p => {
+        // בדוק שהמוצר לא כבר נמצא
+        const alreadyExists = items.some(item =>
+          item.rawName?.toLowerCase().includes(p.name.toLowerCase()) ||
+          p.name.toLowerCase().includes(item.rawName?.toLowerCase() || '')
+        );
+        if (!alreadyExists) {
+          // חשב צפיות ממוצע
+          let kwTv = 0, kwLikes = 0, kwShares = 0;
+          kwVids.forEach(v => {
+            const s = v.statistics || {};
+            kwTv += s.play_count || 0;
+            kwLikes += s.digg_count || 0;
+            kwShares += s.share_count || 0;
+          });
+          const kwAvg = kwVids.length > 0 ? kwTv / kwVids.length : 0;
+          const kwSr = kwTv > 0 ? kwShares / kwTv : 0;
+          const il = inIsrael(p.name, p.name);
+          const ts_s = calcTrend(kwVids.length, kwTv, kwLikes, kwShares, false, 0, p.age==='ותיק', false, null);
+          const { score: is_s, factors } = calcIsrael(kwVids.length, kwAvg, kwSr, false, il, 0, p.age, 'לא ידוע', 'לא ידוע', 0);
+          kwProducts.push({
+            tag: kw,
+            rawName: p.name,
+            isKeywordFind: true, // סומן כמוצר שנמצא דרך מילת חיפוש
+            plat: 'tiktok',
+            baby: false, il,
+            vc: kwVids.length, tv: kwTv, igV: 0, igP: 0,
+            avg: kwAvg, sr: kwSr,
+            ts: ts_s + 10, // בונוס +10 כי נמצא דרך חיפוש = מוקדם יותר
+            is: is_s, factors,
+            topV: kwVids[0]?.statistics?.play_count || 0,
+            aiAge: p.age, aiPotential: 'לא ידוע', aiKnown: 'לא ידוע',
+            comments: null, countries: 0,
+            trendDiff: null, israelDiff: null
+          });
+        }
+      });
+    }
+    await new Promise(r => setTimeout(r, 600));
+  }
 
-  items.sort((a,b)=>{
+  // מיזוג מוצרים מהאשטגים ומילות החיפוש
+  const allItems = [...items, ...kwProducts];
+  document.getElementById('prog-area').innerHTML = '';
+
+  // שמור לזיכרון השבועי
+  saveToHistory(allItems);
+
+  allItems.sort((a,b)=>{
     const ao=a.is>=50&&a.ts<=65&&a.il!==true&&!a.baby;
     const bo=b.is>=50&&b.ts<=65&&b.il!==true&&!b.baby;
     if(ao&&!bo)return -1;if(!ao&&bo)return 1;
     return b.is-a.is;
   });
 
-  const opps=items.filter(p=>p.is>=50&&p.ts<=65&&p.il!==true&&!p.baby).length;
-  const inIL=items.filter(p=>p.il===true).length;
-  document.getElementById('s-total').textContent=items.length;
+  const opps=allItems.filter(p=>p.is>=50&&p.ts<=65&&p.il!==true&&!p.baby).length;
+  const inIL=allItems.filter(p=>p.il===true).length;
+  document.getElementById('s-total').textContent=allItems.length;
   document.getElementById('s-opps').textContent=opps;
   document.getElementById('s-il').textContent=inIL;
   document.getElementById('s-time').textContent=new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
 
   let html='<div class="grid">';
-  items.forEach((item,i)=>{
+  allItems.forEach((item,i)=>{
     const sum=makeSummary(item.ts,item.is,item.il,item.baby);
     const isOpp=item.is>=50&&item.ts<=65&&item.il!==true&&!item.baby;
     const isLate=item.il===true||item.ts>80;
@@ -840,13 +1018,15 @@ async function runScan(){
         <!-- שם המוצר -->
         <div class="product-name">${displayName}</div>
         <div class="product-source">
-          האשטג: #${item.tag}
-          ${isHashtagName?'<span style="color:var(--amber)"> — שם לא זוהה, בדוק ידנית</span>':''}
+          ${item.isKeywordFind
+            ? `<span style="color:var(--accent)">🔍 נמצא דרך חיפוש: "${item.tag}"</span>`
+            : `האשטג: #${item.tag} ${isHashtagName?'<span style="color:var(--amber)"> — שם לא זוהה</span>':''}`}
         </div>
 
         <!-- תגיות -->
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
           ${ageBadge}${ilBadge}
+          ${item.isKeywordFind?'<span class="badge b-blue">🔍 חיפוש מוקדם</span>':''}
           ${item.aiAge==='ותיק'?'<span class="badge b-amber">⏳ מוצר ותיק</span>':item.aiAge==='חדש'?'<span class="badge b-green">✨ מוצר חדש</span>':''}
           ${item.aiPotential==='גבוה'?'<span class="badge b-green">🔥 פוטנציאל גבוה</span>':item.aiPotential==='נמוך'?'<span class="badge b-gray">📉 פוטנציאל נמוך</span>':''}
         </div>
@@ -909,7 +1089,7 @@ async function runScan(){
   html+='</div>';
   document.getElementById('results').innerHTML=html;
 
-  const best=items.filter(p=>p.is>=55&&p.ts<=60&&p.il!==true&&!p.baby);
+  const best=allItems.filter(p=>p.is>=55&&p.ts<=60&&p.il!==true&&!p.baby);
   if(best.length>0){
     document.getElementById('alert-area').innerHTML=`
       <div class="alert">🎯 <b>הזדמנויות השבוע:</b> ${best.map(b=>b.rawName||'#'+b.tag).slice(0,3).join(' · ')} — לא הגיעו לישראל, כדאי לחקור עכשיו</div>`;
@@ -919,6 +1099,7 @@ async function runScan(){
 }
 
 load();
+loadKeywords();
 </script>
 </body>
 </html>
